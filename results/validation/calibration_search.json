@@ -1,0 +1,354 @@
+[
+  {
+    "loss": 0.5371647662934285,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.8082817813839555,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6506978574308055,
+      "sensors.cgm.noise_sd_mgdl": 1.73549304940742,
+      "sensors.cgm.noise_multiplicative_sd": 0.011574022041467017,
+      "sensors.cgm.noise_rho": 0.8976217482874148,
+      "physiology.day_to_day.si_ar_sd": 0.1629236185312198
+    }
+  },
+  {
+    "loss": 0.5987614996429047,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.8139444864810217,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6799540340367337,
+      "sensors.cgm.noise_sd_mgdl": 3.707839771415659,
+      "sensors.cgm.noise_multiplicative_sd": 0.01082779583651603,
+      "sensors.cgm.noise_rho": 0.9160446648986388,
+      "physiology.day_to_day.si_ar_sd": 0.20481012179605218
+    }
+  },
+  {
+    "loss": 0.7604808807217145,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.8433233271400451,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7245591487372016,
+      "sensors.cgm.noise_sd_mgdl": 2.2227297420544287,
+      "sensors.cgm.noise_multiplicative_sd": 0.02404567938746837,
+      "sensors.cgm.noise_rho": 0.9581044318747938,
+      "physiology.day_to_day.si_ar_sd": 0.1618281803315146
+    }
+  },
+  {
+    "loss": 0.9091349430364384,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.9365216445419544,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7152701464891018,
+      "sensors.cgm.noise_sd_mgdl": 1.858440757306948,
+      "sensors.cgm.noise_multiplicative_sd": 0.015973294863613048,
+      "sensors.cgm.noise_rho": 0.9266363352343233,
+      "physiology.day_to_day.si_ar_sd": 0.1421899979597818
+    }
+  },
+  {
+    "loss": 0.9335834692197207,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.854730585172362,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7644130661902593,
+      "sensors.cgm.noise_sd_mgdl": 1.882412568124227,
+      "sensors.cgm.noise_multiplicative_sd": 0.01370913702289457,
+      "sensors.cgm.noise_rho": 0.9493159501621331,
+      "physiology.day_to_day.si_ar_sd": 0.29878155156015684
+    }
+  },
+  {
+    "loss": 0.9956777040539297,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6587035041689117,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6370574470962491,
+      "sensors.cgm.noise_sd_mgdl": 4.380164442081921,
+      "sensors.cgm.noise_multiplicative_sd": 0.009130862751443682,
+      "sensors.cgm.noise_rho": 0.893765207984547,
+      "physiology.day_to_day.si_ar_sd": 0.15246850542791454
+    }
+  },
+  {
+    "loss": 1.0108641314664844,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.7017078032315708,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6577067784297256,
+      "sensors.cgm.noise_sd_mgdl": 4.986880328485814,
+      "sensors.cgm.noise_multiplicative_sd": 0.01620740927998862,
+      "sensors.cgm.noise_rho": 0.9349925370137597,
+      "physiology.day_to_day.si_ar_sd": 0.10931616391129505
+    }
+  },
+  {
+    "loss": 1.0195579632707465,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.8338606258356731,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7368358158751742,
+      "sensors.cgm.noise_sd_mgdl": 2.286205839381804,
+      "sensors.cgm.noise_multiplicative_sd": 0.01269282339525822,
+      "sensors.cgm.noise_rho": 0.8806387526565439,
+      "physiology.day_to_day.si_ar_sd": 0.13715224558938022
+    }
+  },
+  {
+    "loss": 1.1652485628079192,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6256268234284146,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6528207350574917,
+      "sensors.cgm.noise_sd_mgdl": 4.947143766270369,
+      "sensors.cgm.noise_multiplicative_sd": 0.00829237104457956,
+      "sensors.cgm.noise_rho": 0.9461040753804838,
+      "physiology.day_to_day.si_ar_sd": 0.1794317347351284
+    }
+  },
+  {
+    "loss": 1.2367431534062656,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.9149959363966684,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7986056730396098,
+      "sensors.cgm.noise_sd_mgdl": 1.7704540308109629,
+      "sensors.cgm.noise_multiplicative_sd": 0.03518270319713778,
+      "sensors.cgm.noise_rho": 0.977655757958608,
+      "physiology.day_to_day.si_ar_sd": 0.15172912027510502
+    }
+  },
+  {
+    "loss": 1.342420097319067,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5989108694330639,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6526896683776982,
+      "sensors.cgm.noise_sd_mgdl": 3.2578447244062403,
+      "sensors.cgm.noise_multiplicative_sd": 0.007635729235795168,
+      "sensors.cgm.noise_rho": 0.9150009843563138,
+      "physiology.day_to_day.si_ar_sd": 0.1443183361083412
+    }
+  },
+  {
+    "loss": 1.3640053552004705,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6434744581271392,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6898129646324408,
+      "sensors.cgm.noise_sd_mgdl": 2.1517209269834936,
+      "sensors.cgm.noise_multiplicative_sd": 0.005182605520990204,
+      "sensors.cgm.noise_rho": 0.8572895586836514,
+      "physiology.day_to_day.si_ar_sd": 0.29232816446748255
+    }
+  },
+  {
+    "loss": 1.401766827808788,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6382229242543523,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6880896468050063,
+      "sensors.cgm.noise_sd_mgdl": 1.6571993662792082,
+      "sensors.cgm.noise_multiplicative_sd": 0.009825061335245746,
+      "sensors.cgm.noise_rho": 0.8824899473672161,
+      "physiology.day_to_day.si_ar_sd": 0.10362664506749207
+    }
+  },
+  {
+    "loss": 1.596058472920419,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.636792712452229,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7381690702096984,
+      "sensors.cgm.noise_sd_mgdl": 3.232899816573392,
+      "sensors.cgm.noise_multiplicative_sd": 0.027958424314404866,
+      "sensors.cgm.noise_rho": 0.9438224959906969,
+      "physiology.day_to_day.si_ar_sd": 0.2269972837735386
+    }
+  },
+  {
+    "loss": 1.6464743819809988,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5840178403933045,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6804058391455062,
+      "sensors.cgm.noise_sd_mgdl": 4.404717149536889,
+      "sensors.cgm.noise_multiplicative_sd": 0.015962683188873387,
+      "sensors.cgm.noise_rho": 0.9149862975680748,
+      "physiology.day_to_day.si_ar_sd": 0.14708427777073885
+    }
+  },
+  {
+    "loss": 1.8273103164485847,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5426967925252941,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6667530071291761,
+      "sensors.cgm.noise_sd_mgdl": 2.63706695058731,
+      "sensors.cgm.noise_multiplicative_sd": 0.02924500562318967,
+      "sensors.cgm.noise_rho": 0.9301294905551126,
+      "physiology.day_to_day.si_ar_sd": 0.10833011117068447
+    }
+  },
+  {
+    "loss": 2.033663266961776,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5490855209157115,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6921210622979251,
+      "sensors.cgm.noise_sd_mgdl": 4.653682629590616,
+      "sensors.cgm.noise_multiplicative_sd": 0.005860825428267453,
+      "sensors.cgm.noise_rho": 0.9464388117591805,
+      "physiology.day_to_day.si_ar_sd": 0.23137967326713368
+    }
+  },
+  {
+    "loss": 2.3531861024463807,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.583959529764014,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6890619555735534,
+      "sensors.cgm.noise_sd_mgdl": 1.6245103675317523,
+      "sensors.cgm.noise_multiplicative_sd": 0.008907721556565872,
+      "sensors.cgm.noise_rho": 0.8960373055385437,
+      "physiology.day_to_day.si_ar_sd": 0.2455730109173292
+    }
+  },
+  {
+    "loss": 2.5088254697805232,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.7863968452024415,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7634174947542327,
+      "sensors.cgm.noise_sd_mgdl": 4.885107572683821,
+      "sensors.cgm.noise_multiplicative_sd": 0.014038031655478579,
+      "sensors.cgm.noise_rho": 0.8971374870610578,
+      "physiology.day_to_day.si_ar_sd": 0.23648114525315705
+    }
+  },
+  {
+    "loss": 2.6804223031837626,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5496393377430947,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7589701318673481,
+      "sensors.cgm.noise_sd_mgdl": 3.81611640752429,
+      "sensors.cgm.noise_multiplicative_sd": 0.01653894195528857,
+      "sensors.cgm.noise_rho": 0.9203714716157481,
+      "physiology.day_to_day.si_ar_sd": 0.16862861879439578
+    }
+  },
+  {
+    "loss": 2.8047985634281525,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6431218575438714,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.8038901005131378,
+      "sensors.cgm.noise_sd_mgdl": 3.889793754552767,
+      "sensors.cgm.noise_multiplicative_sd": 0.012758308053314174,
+      "sensors.cgm.noise_rho": 0.9339837260265079,
+      "physiology.day_to_day.si_ar_sd": 0.23655466380396245
+    }
+  },
+  {
+    "loss": 2.979098554312306,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5050726378538304,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6848011018694465,
+      "sensors.cgm.noise_sd_mgdl": 1.5942376977205956,
+      "sensors.cgm.noise_multiplicative_sd": 0.014044413967521105,
+      "sensors.cgm.noise_rho": 0.9200289435619271,
+      "physiology.day_to_day.si_ar_sd": 0.10974977800447593
+    }
+  },
+  {
+    "loss": 3.196823438150556,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5840903641633098,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.8153460801939898,
+      "sensors.cgm.noise_sd_mgdl": 4.059212839303095,
+      "sensors.cgm.noise_multiplicative_sd": 0.0070468022305298535,
+      "sensors.cgm.noise_rho": 0.8930441953421785,
+      "physiology.day_to_day.si_ar_sd": 0.1495193389236319
+    }
+  },
+  {
+    "loss": 3.404429519079827,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6327863700146503,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7605970232274277,
+      "sensors.cgm.noise_sd_mgdl": 2.3123063898891267,
+      "sensors.cgm.noise_multiplicative_sd": 0.00933375168919212,
+      "sensors.cgm.noise_rho": 0.9455774964062992,
+      "physiology.day_to_day.si_ar_sd": 0.19442799260639326
+    }
+  },
+  {
+    "loss": 3.550967299071276,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6488709737297312,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7893375732433858,
+      "sensors.cgm.noise_sd_mgdl": 2.203788792171637,
+      "sensors.cgm.noise_multiplicative_sd": 0.009105388401818397,
+      "sensors.cgm.noise_rho": 0.9609041707209193,
+      "physiology.day_to_day.si_ar_sd": 0.24899507967412293
+    }
+  },
+  {
+    "loss": 3.9528876563237993,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5729914767374255,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7709937242267229,
+      "sensors.cgm.noise_sd_mgdl": 2.672251894414631,
+      "sensors.cgm.noise_multiplicative_sd": 0.025504936081359918,
+      "sensors.cgm.noise_rho": 0.8598917737161172,
+      "physiology.day_to_day.si_ar_sd": 0.10891086918700614
+    }
+  },
+  {
+    "loss": 3.962845622199693,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.6025529976118411,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.800910650373532,
+      "sensors.cgm.noise_sd_mgdl": 4.513979110536782,
+      "sensors.cgm.noise_multiplicative_sd": 0.0054139824305319655,
+      "sensors.cgm.noise_rho": 0.9779837960312524,
+      "physiology.day_to_day.si_ar_sd": 0.12336983114073619
+    }
+  },
+  {
+    "loss": 4.224391333982309,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.638064122813506,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7286909454690438,
+      "sensors.cgm.noise_sd_mgdl": 4.518981007694419,
+      "sensors.cgm.noise_multiplicative_sd": 0.02893135899349901,
+      "sensors.cgm.noise_rho": 0.9111046281475571,
+      "physiology.day_to_day.si_ar_sd": 0.17487416899710198
+    }
+  },
+  {
+    "loss": 7.0353323401647785,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5145817165316405,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.7462401412621422,
+      "sensors.cgm.noise_sd_mgdl": 3.288203798361235,
+      "sensors.cgm.noise_multiplicative_sd": 0.03800049288055996,
+      "sensors.cgm.noise_rho": 0.8855876424686093,
+      "physiology.day_to_day.si_ar_sd": 0.14477971760375685
+    }
+  },
+  {
+    "loss": 7.93878435032124,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5074033406882431,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6801551952893005,
+      "sensors.cgm.noise_sd_mgdl": 4.5164525328886596,
+      "sensors.cgm.noise_multiplicative_sd": 0.03125241075986314,
+      "sensors.cgm.noise_rho": 0.8759510262648774,
+      "physiology.day_to_day.si_ar_sd": 0.2379026836741682
+    }
+  },
+  {
+    "loss": 8.274091950523914,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 0.5242964976262197,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.6545766780140599,
+      "sensors.cgm.noise_sd_mgdl": 3.3405338564090696,
+      "sensors.cgm.noise_multiplicative_sd": 0.039628584164077586,
+      "sensors.cgm.noise_rho": 0.8772301622169857,
+      "physiology.day_to_day.si_ar_sd": 0.23274154404306657
+    }
+  },
+  {
+    "loss": 41.15603989101799,
+    "params": {
+      "physiology.gut.absorption_speed_scale": 1.0,
+      "physiology.latent.fasting.fasting_to_mean_ratio": 0.82,
+      "sensors.cgm.noise_sd_mgdl": 5.0,
+      "sensors.cgm.noise_multiplicative_sd": 0.03,
+      "sensors.cgm.noise_rho": 0.7,
+      "physiology.day_to_day.si_ar_sd": 0.12
+    }
+  }
+]

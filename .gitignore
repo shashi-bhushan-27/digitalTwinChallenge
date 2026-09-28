@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Real datasets: never committed, never redistributed (download scripts only)
+data/real/
+
+# Synthetic dataset: regenerated from the seed (see docs/data_card.md); only manifests are kept
+data/synthetic/**
+!data/synthetic/
+!data/synthetic/.gitkeep
+!data/synthetic/*/
+!data/synthetic/*/manifest.json
+
+# Scratch
+*.log
+.DS_Store
+Thumbs.db
+
+# Local working notes, kept out of the public repo (docs/decisions.md D-003)
+CLAUDE.md
+BUILD_PROMPT.md
+.claude/

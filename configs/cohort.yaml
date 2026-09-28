@@ -1,0 +1,221 @@
+# Cohort layer: a synthetic Indian adult Type 2 diabetes clinic population.
+#
+# Every block with a `source` is a provenance record (see common/config.py). `verified: false`
+# means the number is an informed assumption or taken from memory of the literature and has NOT
+# been checked against the source yet. They are listed in docs/parameters_to_verify.md.
+# Reference to check the population-level values against: ICMR-INDIAB national study
+# (Anjana RM et al., Lancet Diabetes & Endocrinology, 2023) and Indian clinic-cohort reports.
+
+sex:
+  p_male: {value: 0.55, source: "assumption: slight male excess in Indian T2D clinic cohorts; check ICMR-INDIAB", verified: false}
+
+height_cm:   # used only to turn BMI into weight
+  male: {mean: 166.5, sd: 6.5, source: "assumption: Indian adult height (NFHS-type surveys); check", verified: false}
+  female: {mean: 153.0, sd: 6.0, source: "assumption: Indian adult height (NFHS-type surveys); check", verified: false}
+
+# Gaussian-copula marginals. dist: normal | lognormal | shifted_lognormal.
+#   normal: mean, sd.  lognormal: median, sigma (of log).  shifted_lognormal: shift + lognormal.
+# min/max clip the tails to plausible clinic values. sex_offset shifts the marginal for women.
+continuous:
+  age_yr:
+    {dist: normal, mean: 52.0, sd: 10.5, min: 28, max: 80,
+     source: "assumption: Indian T2D clinic age profile (earlier onset than Western cohorts); check ICMR-INDIAB", verified: false}
+  bmi:
+    {dist: lognormal, median: 26.3, sigma: 0.15, min: 18.0, max: 42.0,
+     source: "assumption: Indian T2D mean BMI ~26-27, lower than Western T2D; check ICMR-INDIAB", verified: false}
+  waist_cm:
+    {dist: normal, mean: 94.0, sd: 9.0, min: 70, max: 135, sex_offset_female: -4.0,
+     source: "assumption: central obesity at modest BMI (Asian Indian phenotype); check", verified: false}
+  hba1c_pct:
+    {dist: shifted_lognormal, shift: 5.5, median: 2.75, sigma: 0.42, min: 5.8, max: 14.0,
+     source: "assumption: median ~8.2%, right-skewed, poor control common in India; check ICMR-INDIAB / clinic audits", verified: false}
+  fpg_mgdl:
+    {dist: shifted_lognormal, shift: 80.0, median: 70.0, sigma: 0.45, min: 85, max: 380,
+     source: "assumption: median ~150 mg/dL, consistent with the HbA1c marginal; check", verified: false}
+  duration_yr:
+    {dist: lognormal, median: 6.0, sigma: 0.8, min: 0.3, max: 35,
+     source: "assumption: clinic population with median ~6 y since diagnosis; check", verified: false}
+  egfr:
+    {dist: normal, mean: 86.0, sd: 19.0, min: 20, max: 125,
+     source: "assumption: ~10% with eGFR < 60 in Indian T2D clinics; check", verified: false}
+  alt_ul:
+    {dist: lognormal, median: 28.0, sigma: 0.45, min: 8, max: 220,
+     source: "assumption; check", verified: false}
+  tg_mgdl:
+    {dist: lognormal, median: 150.0, sigma: 0.45, min: 45, max: 900,
+     source: "assumption: atherogenic dyslipidaemia (high TG, low HDL) typical in South Asians; check", verified: false}
+  ldl_mgdl:
+    {dist: normal, mean: 104.0, sd: 32.0, min: 35, max: 250,
+     source: "assumption; check", verified: false}
+  hdl_mgdl:
+    {dist: normal, mean: 40.0, sd: 8.5, min: 20, max: 90, sex_offset_female: 5.0,
+     source: "assumption: low HDL typical in South Asians; check", verified: false}
+  sbp_mmhg:
+    {dist: normal, mean: 132.0, sd: 15.0, min: 95, max: 200,
+     source: "assumption; check", verified: false}
+  dbp_mmhg:
+    {dist: normal, mean: 82.0, sd: 9.0, min: 55, max: 120,
+     source: "assumption; check", verified: false}
+
+# Pairwise Spearman-like correlations on the latent normal scale (design assumptions; the
+# matrix is repaired to the nearest valid correlation matrix if needed). Unlisted pairs are 0.
+correlations:
+  source: "design assumption: signs from general clinical knowledge, sizes chosen to be moderate; check against a real cohort if one becomes available"
+  verified: false
+  pairs:
+    - [age_yr, bmi, -0.10]
+    - [age_yr, hba1c_pct, -0.10]
+    - [age_yr, duration_yr, 0.45]
+    - [age_yr, egfr, -0.50]
+    - [age_yr, alt_ul, -0.20]
+    - [age_yr, sbp_mmhg, 0.30]
+    - [age_yr, hdl_mgdl, 0.05]
+    - [bmi, waist_cm, 0.80]
+    - [bmi, hba1c_pct, 0.10]
+    - [bmi, fpg_mgdl, 0.10]
+    - [bmi, duration_yr, -0.10]
+    - [bmi, alt_ul, 0.30]
+    - [bmi, tg_mgdl, 0.20]
+    - [bmi, hdl_mgdl, -0.20]
+    - [bmi, sbp_mmhg, 0.20]
+    - [bmi, dbp_mmhg, 0.20]
+    - [waist_cm, hba1c_pct, 0.12]
+    - [waist_cm, fpg_mgdl, 0.10]
+    - [waist_cm, alt_ul, 0.30]
+    - [waist_cm, tg_mgdl, 0.25]
+    - [waist_cm, hdl_mgdl, -0.25]
+    - [waist_cm, sbp_mmhg, 0.20]
+    - [waist_cm, dbp_mmhg, 0.15]
+    - [hba1c_pct, fpg_mgdl, 0.75]
+    - [hba1c_pct, duration_yr, 0.20]
+    - [hba1c_pct, alt_ul, 0.10]
+    - [hba1c_pct, tg_mgdl, 0.25]
+    - [hba1c_pct, ldl_mgdl, 0.10]
+    - [hba1c_pct, hdl_mgdl, -0.10]
+    - [fpg_mgdl, duration_yr, 0.15]
+    - [fpg_mgdl, tg_mgdl, 0.20]
+    - [duration_yr, egfr, -0.25]
+    - [duration_yr, sbp_mmhg, 0.15]
+    - [egfr, tg_mgdl, -0.10]
+    - [egfr, sbp_mmhg, -0.20]
+    - [alt_ul, tg_mgdl, 0.30]
+    - [alt_ul, hdl_mgdl, -0.10]
+    - [tg_mgdl, ldl_mgdl, 0.15]
+    - [tg_mgdl, hdl_mgdl, -0.40]
+    - [tg_mgdl, sbp_mmhg, 0.10]
+    - [sbp_mmhg, dbp_mmhg, 0.65]
+
+min_onset_age_yr: 22
+
+hba1c_history:
+  months: [-12, -9, -6, -3, 0]
+  trend_mean: 0.10       # % per 12 months (slow drift upwards without treatment change)
+  trend_sd: 0.70
+  visit_noise_sd: 0.20
+  min_value: 5.4
+
+region:   # shapes the meal library (rice- vs wheat-based staples)
+  probs: {north: 0.30, south: 0.30, west: 0.20, east: 0.20}
+
+diet:
+  p_vegetarian_by_region:
+    {north: 0.40, south: 0.25, west: 0.45, east: 0.10,
+     source: "assumption: regional vegetarianism differs widely in India; check NFHS", verified: false}
+  p_jain_given_vegetarian: 0.08   # design choice: enough Jain patients to exercise the constraint
+
+activity:
+  levels: [sedentary, lightly_active, moderately_active]
+  probs: [0.45, 0.35, 0.20]
+  latent_weights: {bmi: -0.35, age_yr: -0.20}   # plus unit-variance noise
+  typical_steps: {sedentary: 3800, lightly_active: 6200, moderately_active: 8800}
+
+fatty_liver:
+  prevalence: {value: 0.55, source: "assumption: NAFLD very common in Indian T2D (ultrasound series); check", verified: false}
+  weights: {waist_cm: 0.9, alt_ul: 0.8, tg_mgdl: 0.5, hba1c_pct: 0.2}
+
+comorbidities:
+  hypertension:
+    sbp_threshold: 140
+    dbp_threshold: 90
+    p_controlled_on_treatment: 0.25   # diagnosed hypertension with BP below threshold
+  dyslipidaemia:
+    ldl_threshold: 130
+    tg_threshold: 200
+    hdl_low_male: 40
+    hdl_low_female: 50
+    p_treated_normal_lipids: 0.30
+  coronary_artery_disease:
+    {base_prevalence: 0.08, source: "assumption; check", verified: false}
+  hypothyroidism:
+    {p_female: 0.12, p_male: 0.04, source: "assumption; check", verified: false}
+  peripheral_neuropathy:
+    {base_prevalence: 0.20, source: "assumption: rises with duration and HbA1c; check", verified: false}
+  ckd_egfr_threshold: 60
+
+family_history:
+  diabetes: {value: 0.55, source: "assumption: strong family history common in Indian T2D; check", verified: false}
+  premature_cvd: 0.15
+
+allergies:   # prevalence per patient; kept low but non-zero so the what-if constraints fire
+  source: "assumption: low single-digit prevalences; check Indian allergy literature"
+  verified: false
+  food: {peanut: 0.025, tree_nut: 0.012, shellfish: 0.015, fish: 0.010, egg: 0.010, milk_protein: 0.006}
+  drug: {sulfonamide_antibiotics: 0.03, penicillin: 0.04}
+  intolerance: {lactose: 0.15, gluten: 0.02, metformin_gi: 0.05}
+
+# Medication rules. Doses and eGFR limits are labelling-type rules recalled from memory:
+# they MUST be reviewed by someone with clinical knowledge (docs/clinical_rules_to_review.md).
+medications:
+  source: "assumption: common Indian T2D prescribing; eGFR limits recalled from drug labels (metformin FDA 2016 communication, DPP-4/SGLT2 labels); clinical review required"
+  verified: false
+  metformin:
+    p_base: 0.88
+    min_egfr: 30              # contraindicated below
+    reduced_max_below_egfr: 45
+    reduced_max_mg: 1000
+    daily_mg: [500, 1000, 1500, 2000]
+    daily_mg_probs: [0.15, 0.35, 0.25, 0.25]
+  sulfonylurea:
+    p_base: 0.42
+    hba1c_slope: 0.35          # logit change per 1 % HbA1c above 8
+    duration_slope: 0.04       # logit change per year of diabetes
+    sulfa_allergy_factor: 0.2  # prescribed less often if sulfonamide-antibiotic allergy (review)
+    drugs:
+      glimepiride: {p: 0.65, doses_mg: [1, 2, 3, 4], dose_probs: [0.3, 0.4, 0.15, 0.15], times: ["08:00"]}
+      gliclazide_mr: {p: 0.35, doses_mg: [30, 60, 90, 120], dose_probs: [0.3, 0.4, 0.2, 0.1], times: ["08:00"]}
+  dpp4_inhibitor:
+    p_base: 0.38
+    drugs:
+      teneligliptin: {p: 0.5, doses_mg: [20], times: ["08:00"]}
+      sitagliptin: {p: 0.3, doses_mg: [100], times: ["08:00"], renal_dose_mg: {egfr_below_45: 50, egfr_below_30: 25}}
+      vildagliptin: {p: 0.2, doses_mg: [50], times: ["08:00", "20:00"]}
+  sglt2_inhibitor:
+    p_base: 0.22
+    min_egfr_glycaemic: 45     # little glucose-lowering below this; prescribed rarely
+    p_below_min: 0.04
+    drugs:
+      dapagliflozin: {p: 0.6, doses_mg: [10], times: ["08:00"]}
+      empagliflozin: {p: 0.4, doses_mg: [10, 25], dose_probs: [0.7, 0.3], times: ["08:00"]}
+  basal_insulin:
+    p_base: 0.10
+    hba1c_slope: 0.6
+    duration_slope: 0.06
+    units_per_kg: [0.15, 0.35]
+    time: "22:00"
+  other:   # context only (no glycaemic effect in the twin)
+    statin_p_if_dyslipidaemia: 0.75
+    statin_p_otherwise: 0.25
+    arb_p_if_hypertension: 0.60
+    ccb_p_if_hypertension: 0.35
+    aspirin_p_if_cad: 0.85
+  adherence:
+    true_beta: [7.0, 2.3]      # mean ~0.75
+    overreport_mean: 0.08      # patients over-report adherence in the EHR
+    overreport_sd: 0.06
+
+habits:   # "reported" lifestyle context in the EHR; actual daily behaviour varies around it
+  dinner_time_by_region: {north: "20:45", south: "20:30", west: "21:00", east: "20:30"}
+  dinner_time_sd_min: 30
+  p_regular_morning_walk_by_activity: {sedentary: 0.10, lightly_active: 0.35, moderately_active: 0.65}
+  p_post_meal_walk_habit: 0.20
+  p_breakfast_skipper: 0.10

@@ -1,0 +1,64 @@
+# Indian meal library: complete "plates" at a standard portion, used by the behaviour layer and
+# the what-if simulator. Macros are rough per-serving estimates (g) written for this prototype;
+# they are NOT taken from a food-composition table yet.
+source: "estimates for a prototype; check each plate against the Indian Food Composition Tables 2017 (NIN, Hyderabad)"
+verified: false
+#
+# diet: veg | egg | nonveg.  jain_ok: a Jain version (no onion, garlic or root vegetables) is
+# commonly cooked.  allergens: peanut, tree_nut, dairy (milk protein and lactose), gluten, egg,
+# fish, shellfish.  gi: high | medium | low (drives the fast-absorbing fraction in the ODE).
+# regions: where the plate is a common everyday choice ("all" = everywhere).
+plates:
+  # ---------------- breakfast ----------------
+  - {id: idli_sambar, name: "Idli (3) with sambar and chutney", meal: [breakfast, dinner], regions: [south], diet: veg, jain_ok: false, allergens: [], gi: high, carbs: 58, protein: 11, fat: 8, fibre: 6}
+  - {id: masala_dosa, name: "Masala dosa with sambar", meal: [breakfast, dinner], regions: [south], diet: veg, jain_ok: false, allergens: [], gi: high, carbs: 62, protein: 9, fat: 14, fibre: 5}
+  - {id: plain_dosa, name: "Plain dosa (2) with sambar", meal: [breakfast, dinner], regions: [south], diet: veg, jain_ok: false, allergens: [], gi: high, carbs: 56, protein: 10, fat: 10, fibre: 5}
+  - {id: pongal, name: "Ven pongal with sambar", meal: [breakfast], regions: [south], diet: veg, jain_ok: true, allergens: [dairy], gi: high, carbs: 55, protein: 11, fat: 12, fibre: 4}
+  - {id: ragi_dosa, name: "Ragi dosa (2) with chutney", meal: [breakfast, dinner], regions: [south], diet: veg, jain_ok: true, allergens: [], gi: medium, carbs: 45, protein: 7, fat: 8, fibre: 7}
+  - {id: upma, name: "Rava upma", meal: [breakfast], regions: [south, west], diet: veg, jain_ok: false, allergens: [gluten], gi: medium, carbs: 45, protein: 7, fat: 10, fibre: 3}
+  - {id: poha, name: "Poha with peanuts", meal: [breakfast], regions: [west, north], diet: veg, jain_ok: false, allergens: [peanut], gi: medium, carbs: 50, protein: 6, fat: 9, fibre: 3}
+  - {id: aloo_paratha, name: "Aloo paratha (2) with curd", meal: [breakfast], regions: [north], diet: veg, jain_ok: false, allergens: [gluten, dairy], gi: medium, carbs: 70, protein: 14, fat: 22, fibre: 6}
+  - {id: besan_chilla, name: "Besan chilla (2) with mint chutney", meal: [breakfast], regions: [north, west], diet: veg, jain_ok: true, allergens: [], gi: low, carbs: 30, protein: 13, fat: 10, fibre: 6}
+  - {id: bread_omelette, name: "Bread (2 slices) and 2-egg omelette", meal: [breakfast], regions: [all], diet: egg, jain_ok: false, allergens: [gluten, egg], gi: high, carbs: 28, protein: 16, fat: 15, fibre: 2}
+  - {id: oats_milk, name: "Oats porridge with milk", meal: [breakfast], regions: [all], diet: veg, jain_ok: true, allergens: [dairy], gi: medium, carbs: 42, protein: 12, fat: 7, fibre: 5}
+  - {id: puri_bhaji, name: "Puri (3) with potato bhaji", meal: [breakfast], regions: [north, west, east], diet: veg, jain_ok: false, allergens: [gluten], gi: high, carbs: 65, protein: 9, fat: 25, fibre: 5}
+  - {id: dhokla, name: "Khaman dhokla (4 pieces)", meal: [breakfast, snack], regions: [west], diet: veg, jain_ok: true, allergens: [], gi: medium, carbs: 38, protein: 10, fat: 8, fibre: 3}
+  - {id: veg_sandwich, name: "Vegetable sandwich", meal: [breakfast, snack], regions: [all], diet: veg, jain_ok: false, allergens: [gluten, dairy], gi: high, carbs: 40, protein: 8, fat: 10, fibre: 4}
+  - {id: egg_bhurji_roti, name: "Egg bhurji with roti (2)", meal: [breakfast, dinner], regions: [north, east], diet: egg, jain_ok: false, allergens: [gluten, egg], gi: medium, carbs: 40, protein: 17, fat: 14, fibre: 5}
+  - {id: moong_sprouts_breakfast, name: "Moong dal cheela (2) with curd", meal: [breakfast], regions: [north, west], diet: veg, jain_ok: true, allergens: [dairy], gi: low, carbs: 32, protein: 15, fat: 8, fibre: 6}
+
+  # ---------------- lunch / dinner ----------------
+  - {id: rice_sambar_meal, name: "Rice, sambar, poriyal and curd", meal: [lunch, dinner], regions: [south], diet: veg, jain_ok: false, allergens: [dairy], gi: high, carbs: 95, protein: 17, fat: 12, fibre: 9}
+  - {id: curd_rice, name: "Curd rice with pickle", meal: [lunch, dinner], regions: [south], diet: veg, jain_ok: true, allergens: [dairy], gi: high, carbs: 60, protein: 10, fat: 8, fibre: 2}
+  - {id: roti_dal_sabzi, name: "Roti (3), dal and mixed-vegetable sabzi", meal: [lunch, dinner], regions: [north, west, east], diet: veg, jain_ok: true, allergens: [gluten], gi: medium, carbs: 75, protein: 18, fat: 14, fibre: 12}
+  - {id: rajma_chawal, name: "Rajma chawal", meal: [lunch, dinner], regions: [north], diet: veg, jain_ok: true, allergens: [], gi: medium, carbs: 85, protein: 18, fat: 10, fibre: 13}
+  - {id: chole_bhature, name: "Chole bhature", meal: [lunch], regions: [north], diet: veg, jain_ok: false, allergens: [gluten, dairy], gi: high, carbs: 95, protein: 18, fat: 35, fibre: 12}
+  - {id: dal_chawal, name: "Dal chawal with ghee", meal: [lunch, dinner], regions: [all], diet: veg, jain_ok: true, allergens: [], gi: high, carbs: 80, protein: 16, fat: 10, fibre: 7}
+  - {id: veg_biryani, name: "Vegetable biryani with raita", meal: [lunch, dinner], regions: [all], diet: veg, jain_ok: false, allergens: [dairy], gi: high, carbs: 90, protein: 14, fat: 20, fibre: 6}
+  - {id: chicken_biryani, name: "Chicken biryani with raita", meal: [lunch, dinner], regions: [all], diet: nonveg, jain_ok: false, allergens: [dairy], gi: high, carbs: 85, protein: 30, fat: 24, fibre: 4}
+  - {id: fish_curry_rice, name: "Fish curry and rice", meal: [lunch, dinner], regions: [east, south, west], diet: nonveg, jain_ok: false, allergens: [fish], gi: high, carbs: 80, protein: 28, fat: 14, fibre: 4}
+  - {id: chicken_curry_roti, name: "Chicken curry with roti (3)", meal: [lunch, dinner], regions: [north, east], diet: nonveg, jain_ok: false, allergens: [gluten], gi: medium, carbs: 60, protein: 32, fat: 20, fibre: 7}
+  - {id: egg_curry_rice, name: "Egg curry and rice", meal: [lunch, dinner], regions: [east, south], diet: egg, jain_ok: false, allergens: [egg], gi: high, carbs: 80, protein: 18, fat: 16, fibre: 4}
+  - {id: prawn_curry_rice, name: "Prawn curry and rice", meal: [lunch, dinner], regions: [west, south, east], diet: nonveg, jain_ok: false, allergens: [shellfish], gi: high, carbs: 78, protein: 26, fat: 14, fibre: 3}
+  - {id: khichdi_kadhi, name: "Khichdi with kadhi", meal: [lunch, dinner], regions: [west, north], diet: veg, jain_ok: true, allergens: [dairy], gi: medium, carbs: 70, protein: 16, fat: 12, fibre: 7}
+  - {id: palak_paneer_roti, name: "Palak paneer with roti (3)", meal: [lunch, dinner], regions: [north], diet: veg, jain_ok: true, allergens: [gluten, dairy], gi: medium, carbs: 62, protein: 22, fat: 24, fibre: 9}
+  - {id: millet_bhakri_meal, name: "Jowar/bajra bhakri (2), dal and sabzi", meal: [lunch, dinner], regions: [west, north], diet: veg, jain_ok: true, allergens: [], gi: low, carbs: 65, protein: 16, fat: 10, fibre: 13}
+  - {id: brown_rice_dal_salad, name: "Brown rice, dal and salad", meal: [lunch, dinner], regions: [all], diet: veg, jain_ok: true, allergens: [], gi: low, carbs: 65, protein: 16, fat: 9, fibre: 11}
+  - {id: mutton_curry_rice, name: "Mutton curry and rice", meal: [lunch, dinner], regions: [all], diet: nonveg, jain_ok: false, allergens: [], gi: high, carbs: 75, protein: 30, fat: 28, fibre: 3}
+  - {id: roti_paneer_salad, name: "Roti (2), paneer bhurji and salad", meal: [dinner], regions: [north, west], diet: veg, jain_ok: true, allergens: [gluten, dairy], gi: low, carbs: 40, protein: 22, fat: 20, fibre: 8}
+  - {id: grilled_chicken_salad_roti, name: "Grilled chicken, salad and roti (2)", meal: [dinner], regions: [all], diet: nonveg, jain_ok: false, allergens: [gluten], gi: low, carbs: 38, protein: 35, fat: 12, fibre: 8}
+
+  # ---------------- snacks ----------------
+  - {id: tea_biscuits, name: "Sweet milk tea with 4 biscuits", meal: [snack], regions: [all], diet: veg, jain_ok: true, allergens: [dairy, gluten], gi: high, carbs: 35, protein: 4, fat: 6, fibre: 1}
+  - {id: samosa_tea, name: "Samosa with sweet tea", meal: [snack], regions: [north, west, east], diet: veg, jain_ok: false, allergens: [gluten, dairy], gi: high, carbs: 45, protein: 6, fat: 20, fibre: 3}
+  - {id: coffee_murukku, name: "Filter coffee with murukku", meal: [snack], regions: [south], diet: veg, jain_ok: false, allergens: [dairy], gi: high, carbs: 30, protein: 5, fat: 12, fibre: 1}
+  - {id: banana, name: "Banana", meal: [snack], regions: [all], diet: veg, jain_ok: true, allergens: [], gi: medium, carbs: 27, protein: 1, fat: 0, fibre: 3}
+  - {id: roasted_chana, name: "Roasted chana (30 g)", meal: [snack], regions: [all], diet: veg, jain_ok: true, allergens: [], gi: low, carbs: 18, protein: 7, fat: 2, fibre: 5}
+  - {id: sprouts_chaat, name: "Sprouts chaat", meal: [snack], regions: [all], diet: veg, jain_ok: false, allergens: [], gi: low, carbs: 22, protein: 10, fat: 2, fibre: 7}
+  - {id: peanut_chikki, name: "Peanut chikki", meal: [snack], regions: [west, north], diet: veg, jain_ok: true, allergens: [peanut], gi: medium, carbs: 25, protein: 6, fat: 10, fibre: 2}
+  - {id: mixed_nuts, name: "Mixed nuts (30 g)", meal: [snack], regions: [all], diet: veg, jain_ok: true, allergens: [tree_nut], gi: low, carbs: 8, protein: 6, fat: 16, fibre: 3}
+  - {id: fruit_bowl, name: "Guava/papaya fruit bowl", meal: [snack], regions: [all], diet: veg, jain_ok: true, allergens: [], gi: low, carbs: 25, protein: 1, fat: 0, fibre: 5}
+  - {id: buttermilk, name: "Buttermilk (chaas)", meal: [snack], regions: [all], diet: veg, jain_ok: true, allergens: [dairy], gi: low, carbs: 6, protein: 4, fat: 2, fibre: 0}
+  - {id: gulab_jamun, name: "Gulab jamun (2)", meal: [dessert], regions: [all], diet: veg, jain_ok: true, allergens: [dairy, gluten], gi: high, carbs: 50, protein: 4, fat: 12, fibre: 0}
+
+heavy_meal_ids: [chole_bhature, veg_biryani, chicken_biryani, mutton_curry_rice, puri_bhaji]

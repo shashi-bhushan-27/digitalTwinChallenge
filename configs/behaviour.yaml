@@ -1,0 +1,102 @@
+# Behaviour layer: meals, activity, sleep, stress, heart rate and HRV.
+# Patient-level habits are drawn from the EHR lifestyle fields PLUS hidden variation, and each
+# day varies around them, so the wearable stream is not a fixed function of the record.
+# All values are design assumptions unless tagged with a source.
+
+meals:
+  breakfast: {mean: "08:15", between_patient_sd_min: 30, day_sd_min: 20, weekend_shift_min: 45}
+  lunch: {mean: "13:30", between_patient_sd_min: 30, day_sd_min: 25, weekend_shift_min: 20}
+  snack: {mean: "17:30", between_patient_sd_min: 30, day_sd_min: 30, weekend_shift_min: 0}
+  dinner_actual_vs_reported_sd_min: 20
+  dinner_day_sd_min: 25
+  dinner_weekend_shift_min: 30
+  p_skip_breakfast: {skipper: 0.6, other: 0.05}
+  p_snack_beta: [4.0, 2.0]          # patient-level probability of an evening snack
+  p_late_snack: 0.06
+  portion_patient_sd: 0.15          # log-scale appetite differences between patients
+  portion_meal_sd: 0.20             # log-scale meal-to-meal variation
+  weekend_portion_factor: 1.12
+  p_eating_out: {weekday: 0.06, weekend: 0.20}
+  eating_out_portion_factor: 1.25
+  p_dessert_when_out: 0.5
+  n_favourites: {breakfast: 5, lunch: 6, dinner: 6, snack: 4}
+  region_match_weight: 4.0
+  p_lunch_buttermilk: 0.15
+
+meal_log:
+  p_never_logs: 0.20
+  logging_rate_beta: [6.0, 2.5]     # among patients who log at all
+  carb_estimate_bias_log: -0.10     # people under-estimate carbs
+  carb_estimate_sd_log: 0.30
+  time_error_sd_min: 10
+
+activity:
+  wake_active_fraction_scale: 1.0
+  incidental_cadence: [40, 90]      # steps/min inside incidental bouts
+  incidental_bout_mean_min: 6
+  day_total_sd_log: 0.25
+  weekend_factor: {employed: 0.85, not_employed: 1.05}
+  p_employed_by_sex: {M: 0.80, F: 0.45}
+  retirement_age: 60
+  commute: {times: ["09:00", "18:30"], duration_min: [8, 15], cadence: [95, 110]}
+  morning_walk: {time: "06:30", time_sd_min: 25, duration_min: [25, 45], cadence: [100, 120], p_day_if_habit: 0.75, p_day_otherwise: 0.03}
+  post_meal_walk: {delay_min: [10, 30], duration_min: [10, 20], cadence: [90, 105], p_if_habit: 0.55, p_otherwise: 0.04}
+
+sleep:
+  bedtime_mean: "23:00"
+  bedtime_between_sd_min: 40
+  bedtime_day_sd_min: 30
+  weekend_bedtime_shift_min: 40
+  duration_mean_h: 6.8
+  duration_between_sd_h: 0.6
+  duration_day_sd_h: 0.6
+  weekend_extra_h: 0.5
+  p_short_night: 0.08
+  short_night_loss_h: 2.0
+  latency_mean_min: 15
+  cycle_min: [80, 100]
+  deep_fraction_first_cycle: 0.40
+  deep_fraction_decay: 0.55         # deep sleep share falls with each cycle
+  deep_age_decline_per_10y: 0.12
+  rem_fraction_first_cycle: 0.10
+  rem_fraction_growth: 0.07
+  awakenings_per_hour: 0.6
+  awakening_min: [1, 6]
+
+stress:
+  ar_rho: 0.6
+  weekday_offset: 0.15
+  p_illness_start: 0.01
+  illness_days: [2, 4]
+
+heart:
+  rhr_mean: 72
+  rhr_between_sd: 6
+  rhr_bmi_per_unit: 0.3
+  rhr_activity_per_level: -2.5
+  awake_offset: 8
+  steps_gain_per_spm: 0.25
+  stress_bpm_per_sd: 3.0
+  illness_bpm: 8
+  noise_sd: 3.0
+  noise_rho: 0.9
+  sleep_offsets: {light: -6, deep: -9, rem: -3, wake: 2}
+  circadian_amp: 3.0
+
+hrv:
+  rmssd_ref_ms: 28.0                # at age 50, duration 6 y, no neuropathy
+  age_per_10y_log: -0.12
+  duration_per_yr_log: -0.012
+  neuropathy_log: -0.20
+  between_sd_log: 0.30
+  stress_per_sd_log: -0.15
+  illness_log: -0.15
+  sleep_hours_log: 0.05
+  night_sd_log: 0.12
+  stage_factor: {light: 1.0, deep: 1.15, rem: 0.9, wake: 0.8}
+  epoch_sd_log: 0.15
+
+medication_taking:
+  time_sd_min: 20
+  weekend_adherence_drop: 0.05
+  evening_adherence_drop: 0.03

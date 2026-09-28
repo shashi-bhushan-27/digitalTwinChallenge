@@ -1,0 +1,40 @@
+[project]
+name = "t2d-digital-twin"
+version = "0.1.0"
+description = "Proof-of-concept Type 2 diabetes digital twin: synthetic EHR + CGM/wearable data, spike forecasting and an ODE what-if twin."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "pyarrow>=17",
+    "pyyaml>=6.0",
+    "scipy>=1.13",
+    "scikit-learn>=1.5",
+    "lightgbm>=4.5",
+    "matplotlib>=3.9",
+    "openpyxl>=3.1",
+    "xlrd>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "NPY"]
+ignore = ["E501", "E741"]  # E741: G, I, X follow the physiology notation

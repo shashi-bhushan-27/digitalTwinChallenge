@@ -1,0 +1,27 @@
+# Pipeline settings for the synthetic dataset. One master seed drives every layer
+# (common/seeding.py derives an independent stream per layer, patient and purpose).
+seed: 20261020
+dataset_version: v0.1
+
+cohort:
+  n_patients: 400
+  id_prefix: SP          # "synthetic patient"
+
+simulation:
+  n_days: 14             # about one CGM sensor lifetime plus a spare session
+  start_date: "2026-03-02"   # synthetic calendar; a Monday so weekday/weekend patterns line up
+  ode_step_min: 1
+  warmup_days: 1         # simulated but discarded, so the ODE starts from a settled state
+
+sampling:
+  cgm_interval_min: 5    # Dexcom-G6-like; validation resamples to 15 min to match Libre data
+  wearable_interval_min: 5
+  store_true_glucose_interval_min: 5
+
+split:                   # by patient, never by time window (BUILD_PROMPT rule 7)
+  train: 0.70
+  val: 0.15
+  test: 0.15
+
+output:
+  dir: data/synthetic

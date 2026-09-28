@@ -1,0 +1,41 @@
+# Validation and calibration settings (docs/decisions.md D-009, D-010).
+seed: 7
+
+real_split:
+  # Shanghai T2DM patients are split once by patient: half tune the generator, half are held out.
+  # CGMacros T2D participants are never used for tuning (external check).
+  calibration_fraction: 0.5
+  min_days: 3
+
+resample_min: 15              # both real datasets are 15-minute CGM
+
+# Level-matched comparison pool. Real CGM during the recordings sits far below the HbA1c-implied
+# level (treated/monitored state), so dynamics are compared between real and synthetic patients
+# matched on mean CGM. The pool therefore covers lower glycaemic levels than the main cohort.
+pool:
+  n_patients: 300
+  n_days: 10
+  cohort_overlay:
+    continuous:
+      hba1c_pct: {dist: shifted_lognormal, shift: 5.0, median: 2.0, sigma: 0.45, min: 5.3, max: 12.5}
+      fpg_mgdl: {dist: shifted_lognormal, shift: 60.0, median: 65.0, sigma: 0.45, min: 75, max: 330}
+
+# Metrics compared after matching (per-patient values; medians compared, scaled by the real IQR)
+compare_metrics: [cv, mage, sd, tir_70_180, tar_180, nocturnal_to_mean, day_to_day_cv, diff_sd, diff2_sd, pp_rise, pp_time_to_peak, spikes_per_day]
+# Post-meal rise depends on meal size, which differs by design (Indian home meals vs small hospital
+# meals, half the Shanghai patients on prandial insulin), so it gets a low weight and meal size is
+# not tuned. Spike rate is reported but not fitted.
+loss_metrics: {cv: 1.0, mage: 1.0, nocturnal_to_mean: 1.0, diff_sd: 1.0, diff2_sd: 1.0, pp_time_to_peak: 1.0, day_to_day_cv: 0.5, pp_rise: 0.3}
+
+calibration:
+  n_patients: 160
+  n_days: 7
+  n_candidates: 32
+  # parameter: [low, high] searched on a log scale; applied as overlays to the named config
+  search:
+    physiology.gut.absorption_speed_scale: [0.5, 0.95]
+    physiology.latent.fasting.fasting_to_mean_ratio: [0.62, 0.82]
+    sensors.cgm.noise_sd_mgdl: [1.5, 5.0]
+    sensors.cgm.noise_multiplicative_sd: [0.005, 0.04]
+    sensors.cgm.noise_rho: [0.85, 0.98]
+    physiology.day_to_day.si_ar_sd: [0.10, 0.30]

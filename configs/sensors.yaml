@@ -1,0 +1,47 @@
+# Sensor realism layer: turns true signals into what devices would record.
+# Design assumptions unless tagged; target CGM accuracy is in the range reported for current
+# factory-calibrated sensors (MARD roughly 8-12 %), checked by tests/test_sensors.py.
+
+cgm:
+  interval_min: 5
+  session_days: 10
+  first_session_offset_days: [-4.0, 0.0]
+  warmup_h: 2
+  lag_tau_min: {value: [5, 15], source: "blood-to-interstitial glucose lag of ~5-15 min (CLAUDE.md brief; CGM physiology literature); check", verified: false}
+  gain_sd: 0.04
+  offset_sd_mgdl: 4.0
+  gain_drift_sd_per_day: 0.012
+  offset_drift_sd_per_day: 1.5
+  noise_sd_mgdl: 5.0
+  noise_rho: 0.7
+  noise_multiplicative_sd: 0.03
+  first_day_noise_factor: 1.6
+  dropouts_per_day: 1.0
+  dropout_mean_samples: 5
+  long_gaps_per_day: 0.05
+  long_gap_samples: [12, 48]
+  compression_low_p_per_night: 0.15
+  compression_depth_mgdl: [25, 60]
+  compression_duration_min: [15, 60]
+  range_mgdl: [40, 400]
+
+wearable:
+  interval_min: 5
+  timestamp_jitter_s: 60
+  charging_min: [45, 100]
+  p_charge_per_day: 0.9
+  p_removed_per_day: 0.10
+  removed_h: [2, 8]
+  p_not_worn_night: 0.06
+  random_missing_hr: 0.03
+  phantom_steps_p_per_day: 0.30
+  phantom_cadence: [15, 60]
+  phantom_duration_min: [10, 30]
+  hr_noise_sd: 2.0
+  hrv_noise_sd_log: 0.15
+  # rows = true stage (wake, light, deep, rem), columns = recorded stage
+  sleep_stage_confusion:
+    - [0.60, 0.35, 0.00, 0.05]
+    - [0.08, 0.75, 0.10, 0.07]
+    - [0.02, 0.35, 0.60, 0.03]
+    - [0.05, 0.30, 0.02, 0.63]
