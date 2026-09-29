@@ -55,3 +55,11 @@ def test_time_controls(app):
     for label in ("+1 h", "−1 h", "+15 min"):
         next(b for b in app.button if b.label == label).click().run()
         assert not app.exception
+
+
+def test_replay_button_does_not_crash(app):
+    app.selectbox(key="scene").set_value(app.selectbox(key="scene").options[0]).run()
+    before = (app.session_state["day"], app.session_state["clock"])
+    next(b for b in app.button if b.label.endswith("Replay the next 2 hours")).click().run()
+    assert not app.exception, [e.value for e in app.exception]
+    assert (app.session_state["day"], app.session_state["clock"]) != before

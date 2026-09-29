@@ -35,7 +35,7 @@ def hero(cgm: pd.DataFrame, forecast: pd.DataFrame, meals: pd.DataFrame, steps: 
     fig.add_trace(go.Scatter(x=cgm["timestamp"], y=cgm["glucose_mgdl"], mode="lines", name="CGM", line=dict(color=ACCENT, width=2),
                              hovertemplate="%{y:.0f} mg/dL<extra>CGM</extra>"), row=1, col=1)
     fig.add_trace(go.Scatter(x=list(forecast["timestamp"]) + list(forecast["timestamp"][::-1]), y=list(forecast["hi"]) + list(forecast["lo"][::-1]),
-                             fill="toself", fillcolor=BAND, line=dict(width=0), name="80 % range", hoverinfo="skip"), row=1, col=1)
+                             fill="toself", fillcolor=BAND, mode="lines", line=dict(width=0), name="80 % range", hoverinfo="skip"), row=1, col=1)
     fig.add_trace(go.Scatter(x=forecast["timestamp"], y=forecast["point"], mode="lines+markers", name="forecast",
                              line=dict(color=ACCENT, width=2, dash="dash"), marker=dict(size=5),
                              hovertemplate="%{y:.0f} mg/dL<extra>forecast</extra>"), row=1, col=1)

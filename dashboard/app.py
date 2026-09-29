@@ -26,7 +26,7 @@ st.set_page_config(page_title="T2D Digital Twin", page_icon="🩺", layout="wide
 
 CSS = """
 <style>
-.block-container {padding-top: 1.2rem; padding-bottom: 1rem; max-width: 1500px;}
+.block-container {padding-top: 3.4rem; padding-bottom: 1rem; max-width: 1500px;}
 .banner {background:#fff4e0; border:1px solid #f0c98a; color:#6b4500; padding:6px 14px; border-radius:6px; font-weight:600; margin-bottom:8px; font-size:15px;}
 .chip {display:inline-block; padding:3px 11px; border-radius:14px; margin:2px 4px 2px 0; background:#eef2f7; color:#1f2937; font-size:14px;}
 .chip-red {background:#c0392b; color:#fff; font-weight:600;}
@@ -135,6 +135,9 @@ if "pid" not in st.session_state:
     st.session_state["pid"] = first["patient_id"]
     set_time(pd.Timestamp(first["timestamp"]))
 
+if "_goto" in st.session_state:          # a time jump requested after the widgets were drawn (replay)
+    set_time(pd.Timestamp(st.session_state.pop("_goto")))
+
 with st.sidebar:
     st.markdown("### T2D digital twin")
     st.selectbox("Demo scene", list(scenes) + [FREE], key="scene", on_change=on_scene)
@@ -173,7 +176,7 @@ meds = dd.tables["medications"][dd.tables["medications"]["patient_id"] == pid]
 # pieces
 # ------------------------------------------------------------------------------------------------
 
-def header(snap: dict) -> None:
+def header(snap: dict, t: pd.Timestamp | None = None) -> str:
     p = patient
     glucose_meds = [m.drug.replace("_", " ") for m in meds.itertuples() if m.drug_class in
                     ("biguanide", "sulfonylurea", "dpp4_inhibitor", "sglt2_inhibitor", "basal_insulin")]
@@ -184,7 +187,7 @@ def header(snap: dict) -> None:
              f'<span class="chip">HbA1c {p["hba1c_pct"]:.1f} % {trend}</span>',
              f'<span class="chip">eGFR {int(p["egfr"])}</span>',
              f'<span class="chip">{", ".join(glucose_meds) or "no glucose-lowering drugs"}</span>']
-    st.markdown(f'<div class="header">{pid} · synthetic patient · {now:%a %d %b %H:%M}</div>' + "".join(chips), unsafe_allow_html=True)
+    return f'<div class="header">{pid} · synthetic patient · {(t or now):%a %d %b %H:%M}</div>' + "".join(chips)
 
 
 def allergy_chips(p) -> str:
@@ -279,13 +282,17 @@ tab_patient, tab_whatif, tab_triage, tab_about = st.tabs(["Patient", "What-if", 
 
 with tab_patient:
     snap = service.snapshot(dd, pid, now, thr)
-    header(snap)
+    head = st.empty()
+    head.markdown(header(snap), unsafe_allow_html=True)
     annot = st.empty()
     dq = snap["quality"]
     annot.markdown(f'<div class="annot">{snap["annotation"]}</div>', unsafe_allow_html=True)
     if dq["messages"]:
         st.markdown(f'<span class="chip chip-warn">Data quality: {dq["level"]} · {"; ".join(dq["messages"])}</span>', unsafe_allow_html=True)
     left, right = st.columns([1, 2.6], gap="medium")
+    with left:                            # drawn first so it stays visible during a replay
+        record_card()
+        twin_card_view()
     with right:
         chart = st.empty()
         chart.plotly_chart(hero_figure(now, snap), width="stretch", config={"displayModeBar": False}, key="hero")
@@ -293,15 +300,13 @@ with tab_patient:
             for k in range(1, 9):
                 t = now + pd.Timedelta(minutes=15 * k)
                 s2 = service.snapshot(dd, pid, t, thr)
-                annot.markdown(f'<div class="annot">{t:%H:%M} · {s2["annotation"]}</div>', unsafe_allow_html=True)
+                head.markdown(header(s2, t), unsafe_allow_html=True)
+                annot.markdown(f'<div class="annot">{s2["annotation"]}</div>', unsafe_allow_html=True)
                 chart.plotly_chart(hero_figure(t, s2), width="stretch", config={"displayModeBar": False}, key=f"hero_play_{k}")
                 _time.sleep(0.5)
-            set_time(now + pd.Timedelta(hours=2))
+            st.session_state["_goto"] = str(now + pd.Timedelta(hours=2))   # applied before the widgets on the next run
             st.rerun()
         why_panel(explain(pid, str(snap["time"])), snap)
-    with left:
-        record_card()
-        twin_card_view()
 
 with tab_whatif:
     from twin import constraints as C

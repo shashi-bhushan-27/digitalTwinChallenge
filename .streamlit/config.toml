@@ -12,3 +12,6 @@ runOnSave = false
 
 [browser]
 gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"   # no Deploy button or developer menu on the screen share
