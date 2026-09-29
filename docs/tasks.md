@@ -13,22 +13,28 @@ Status: `[x]` done, `[~]` in progress, `[ ]` to do. Updated at the end of each w
 - [x] 8. Validation metrics, level-matched comparison, calibration on the Shanghai calibration half (loss 41.2 -> 0.54)
 - [x] 9. Discriminator and TSTR (with TRTR reference)
 - [x] 10. Validation report, data card, data dictionary, parameters-to-verify list, README, phase review and commit
-- [ ] 11. Generator follow-up (D-018): faster post-peak fall; add fall rate to calibration targets
+- [x] 11. Generator follow-up (D-018): fall-rate targets, p2 in the search, local refinement (partial improvement, gap documented)
 
 ## Waiting on the team
-- [ ] Confirm spike definition (D-004) and whether CLAUDE.md / BUILD_PROMPT.md stay out of the public repo (D-003)
-- [ ] Team member names, college name for the README; licence (default MIT)
+- [x] Confirm spike definition (D-004) and whether CLAUDE.md / BUILD_PROMPT.md stay out of the public repo (D-003)
+- [x] Team details (solo: Shashi Bhushan, VIT Vellore); licence MIT
 - [ ] Clinical review of `docs/clinical_rules_to_review.md`
 - [ ] Check literature values in `docs/parameters_to_verify.md` (ICMR-INDIAB, IFCT 2017, drug labels)
 
-## Phase 2: Models (next)
-- [ ] Feature builder (CGM lags/slopes/rolling stats, wearable summaries, EHR) on observed tables only
-- [ ] Baselines: persistence, linear extrapolation, LightGBM CGM-only
-- [ ] LightGBM fusion: multi-horizon quantile forecast + calibrated spike classifier
-- [ ] Ablation ladder and with/without meal log
-- [ ] Metrics: MAE/RMSE per horizon, Clarke grid, PR-AUC, precision/recall, lead time, false alerts per patient-day, calibration
-- [ ] SHAP grouped into clinical concepts, templated sentences, validation against generator truth
+## Phase 2: Models (done 30 Sep)
+- [x] Feature builder on observed tables only, with a no-future-leakage test
+- [x] Baselines: persistence, linear extrapolation, LightGBM CGM-only
+- [x] LightGBM fusion: forecasts 15-120 min with conformal 80 % band, peak model, calibrated spike classifier
+- [x] Ablation ladder (+ wearables, + EHR, + meal log) with patient-bootstrap intervals and strata
+- [x] Metrics: MAE/RMSE per horizon, Clarke grid, PR-AUC, precision/recall, lead time, false alerts per patient-day, calibration, Brier
+- [x] SHAP grouped into clinical concepts vs a similar-patient reference, templated sentences, checks against generator truth
+- [x] `docs/model_report.md`, `docs/example_explanations.md`, inference API for the dashboard
+- [ ] Clinician read of `docs/example_explanations.md`
 
-## Phase 3: Twin core and what-if
+## Phase 3: Twin core and what-if (next)
+- [ ] Twin state estimation: fit a patient's hidden parameters from observed CGM + meal log + EHR (validate against truth)
+- [ ] `twin/` simulate(profile, state, intervention) API on the ODE core; Indian meal library for swaps
+- [ ] Constraint checks (allergies, diet, eGFR drug limits) with reasons; hypoglycaemia flag (< 70 mg/dL)
+- [ ] Worked examples with plots; `docs/clinical_rules_to_review.md` updated
 ## Phase 4: Dashboard
 ## Phase 5: Submission package

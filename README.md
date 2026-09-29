@@ -6,14 +6,14 @@
 
 | | |
 |---|---|
-| Team | AMRIT_VIT: _member names to be added_ |
-| College / incubator | _VIT (full name and campus to be confirmed)_ |
+| Team | AMRIT_VIT (one member): **Shashi Bhushan**, team leader, shashibhushanvijay@gmail.com |
+| College | Vellore Institute of Technology (VIT), Vellore |
 | Condition | Type 2 diabetes (India) |
-| Status | Phase 1 (synthetic data generation and validation) complete; Phase 2 (models) next |
+| Status | Phase 1 (synthetic data + validation) and Phase 2 (prediction models + explanations) complete; Phase 3 (what-if twin) next |
 | Video | _link to be added (20+ minute recording)_ |
 | Architecture diagram | _docs/architecture.pdf (Phase 5)_ |
 | Presentation | _docs/presentation.pdf (Phase 5)_ |
-| Licence | _to be confirmed by the team (default MIT)_ |
+| Licence | MIT (see [LICENSE](LICENSE)); third-party data keep their own licences (below) |
 
 ## Problem and healthcare use case
 
@@ -50,8 +50,14 @@ No real patient data is used anywhere (DPDP Act and HIPAA): the patients are sim
 
 The dataset (400 patients x 14 days) regenerates identically from one seed and is split 70/15/15 **by patient**.
 
+### Prediction models and explanations (Phase 2, done)
+- **Features** (`models/features.py`) are built only from what a clinic would observe up to the prediction time (a test changes the future and checks nothing earlier moves): CGM level, lags, trends, variability and excursion shape; steps, heart rate, last night's sleep and HRV; the patient's own meal log; the EHR record and prescription schedule.
+- **Models** (`models/train.py`): persistence and linear-extrapolation baselines; an ablation ladder of LightGBM models (CGM only, + wearables, + EHR, + meal log); the fusion model with point and quantile forecasts at 15-120 min (80 % band widened by split-conformal calibration), a peak-glucose model, and a spike-onset classifier with isotonic calibration and an alert threshold chosen on validation patients.
+- **Explanations** (`models/explain.py`): interventional TreeSHAP on the peak model against a reference cohort of similar patients, grouped into clinical concepts and rendered as templated sentences, with checks against the simulator's hidden truth.
+- **Inference API** (`models/inference.py`): one small interface the dashboard will call.
+
 ### Validation against real open data (Phase 1, done)
-Real data is used **only** to calibrate four population-level settings and to validate. It is never used to train the product models.
+Real data is used **only** to calibrate seven population-level settings and to validate. It is never used to train the product models.
 - Shanghai T2DM (Zhao et al., Scientific Data 2023; CC BY 4.0): split by patient into a calibration half and a held-out half.
 - CGMacros T2D participants (PhysioNet; CC BY-NC-SA 4.0): external check, never used for tuning.
 
@@ -59,19 +65,67 @@ Results are in [`docs/validation_report.md`](docs/validation_report.md) (summary
 
 ## Results so far
 
-All numbers come from `uv run python -m validation.report` and `uv run python -m data_gen.describe` (dataset v0.1, seed 20261020). Details: [`docs/validation_report.md`](docs/validation_report.md), [`docs/data_card.md`](docs/data_card.md).
+Every number below comes from a pipeline run (dataset v0.1, seed 20261020). Details are in [`docs/validation_report.md`](docs/validation_report.md), [`docs/model_report.md`](docs/model_report.md) and [`docs/data_card.md`](docs/data_card.md). The models are trained and tested on synthetic patients, so their scores describe the simulated world and are an upper bound for real patients.
 
-**The synthetic dataset.** 400 patients x 14 days (5,600 patient-days, 1.6 M CGM readings, 2.8 % missing). The simulated CGM has a MARD of 7.1 % against the hidden true glucose. Median time in range is 46 % at a median HbA1c of 8.3 %, and simulated mean glucose follows the HbA1c-based estimate (ADAG).
+### Phase 1: a realistic synthetic cohort
+
+**The dataset.** 400 patients × 14 days: 5,600 patient-days and 1.6 M CGM readings, 2.8 % of them missing. The simulated CGM has a MARD of 7.3 % against the hidden true glucose. Median time in range is 45 % at a median HbA1c of 8.3 %, and mean glucose follows the HbA1c-based estimate (ADAG).
 
 ![three synthetic patients](results/data/example_patients.png)
 
-**Glucose dynamics vs real T2D CGM (level-matched).** Real CGM in the open datasets sits well below the HbA1c-implied level (monitored, treated periods), so each real patient is compared with the synthetic patient of the closest mean glucose. On the held-out Shanghai half (49 patients), all 12 compared metrics fall within half an interquartile range of the real median: CV 0.26 vs 0.27, MAGE 80 vs 92 mg/dL, night/mean ratio 0.84 vs 0.82, time to post-meal peak 94 vs 90 min, spikes above 180 per day 1.60 vs 1.63.
+**Glucose dynamics vs real T2D CGM (level-matched).** Real CGM in the open datasets sits well below the level HbA1c implies, because the recordings capture monitored, treated periods. So each real patient is compared with the synthetic patient whose mean glucose is closest.
+
+On the held-out Shanghai half (49 patients), 12 of 14 compared metrics fall within half an interquartile range of the real median:
+
+| metric | real | synthetic |
+|---|---|---|
+| CV | 0.27 | 0.26 |
+| night/mean ratio | 0.82 | 0.82 |
+| time to post-meal peak | 90 min | 93 min |
+| spikes above 180 per day | 1.63 | 1.60 |
+
+The two outside are MAGE (75 vs 92 mg/dL) and the fastest falls (5th percentile of 15-minute change: −11 vs −14 mg/dL).
 
 ![matched dynamics](results/validation/matched_distributions.png)
 
-**Train on synthetic, test on real (TSTR).** A CGM-only forecaster trained only on synthetic patients predicts real Shanghai glucose 60 minutes ahead with a MAE of 19.2 mg/dL. That beats persistence (19.9) and sits close to a model trained on real patients (17.5). For spike detection, PR-AUC is 0.33, against 0.28 for persistence and 0.37 for the real-trained model.
+**Train on synthetic, test on real (TSTR).** A CGM-only forecaster trained only on synthetic patients predicts real Shanghai glucose 60 minutes ahead with a MAE of 18.7 mg/dL. That beats persistence (19.9) and comes close to a model trained on real patients (17.5).
 
-**Where the simulator still falls short.** A real-vs-synthetic discriminator still separates 12-hour windows easily: AUC 0.95 level-matched. The main cue is that real glucose falls faster after peaks (median steepest 15-minute fall −19.8 vs −14 mg/dL). Time-of-day patterns also don't transfer between a Shanghai hospital meal schedule and an Indian home schedule. Both are listed as next steps in the validation report.
+**Where the simulator still falls short.** A classifier can still tell real from synthetic 12-hour windows (AUC 0.95, level-matched). Real glucose falls faster after peaks: the median steepest 15-minute fall is −18 to −20 mg/dL, against −15 in the simulator.
+
+### Phase 2: spike prediction and explanations (held-out test patients)
+
+**Forecast.** The fusion model (CGM + wearables + EHR + meal log) has these errors:
+
+| horizon | MAE | persistence MAE |
+|---|---|---|
+| 15 min | 4.8 mg/dL | |
+| 60 min | 14.1 mg/dL | 24.6 mg/dL |
+| 120 min | 22.7 mg/dL | 41.2 mg/dL |
+
+At 60 minutes, 99.6 % of forecasts fall in Clarke zones A+B. The 80 % band covers 79 % of outcomes.
+
+**Spike alerts** (onset above 180 mg/dL for 15 minutes or more within 2 hours):
+- PR-AUC 0.848, AUROC 0.915, Brier 0.115.
+- At the threshold chosen on validation patients, 95.9 % of spikes are caught, with a median lead time of 95 minutes.
+- There are 1.0 false alert episodes per patient-day. A sensitivity slider trades this down to 0.27 per day, at 85 % of spikes caught.
+
+![alert trade-off](results/models/alert_tradeoff.png)
+
+**Does fusion help?** Differences are paired, with patient-level bootstrap 95 % intervals:
+- **Meal log:** the clear winner. 60-minute MAE improves by 0.78 mg/dL [0.64, 0.90] and PR-AUC by 0.010.
+- **Wearables:** slightly worse overall (MAE +0.11 [0.04, 0.19]), but they help where physiology says they should. Right after a walk, MAE improves by 0.90 mg/dL [0.24, 1.64].
+- **EHR record:** no overall effect. It adds a small PR-AUC gain in a patient's first 24 hours, when CGM history is short.
+
+The honest conclusion: with hours of CGM history, the glucose trace already carries most of what the record and the wearable tell you about today's physiology.
+
+![ablation](results/models/ablation.png)
+
+**Explanations.** SHAP on the predicted 2-hour peak is grouped into clinical concepts, measured against similar patients, and turned into sentences ([examples](docs/example_explanations.md)). Contributions sum exactly to the prediction. Checks against the simulator's hidden truth:
+- After a logged meal of 60 g or more, "logged meals" is a top-3 driver 99.8 % of the time.
+- Removing the top-3 concepts moves the prediction 19.5 mg/dL, against 5.6 for random ones.
+- Similar moments get similar explanations: cosine similarity 0.75, against 0.04 for random pairs.
+
+One check went the "wrong" way, and it teaches something. After a post-meal walk the model predicts a larger rise, and the data show why: glucose is temporarily suppressed while the meal is still being absorbed. SHAP describes what the model relied on, not the effect of an intervention. That is why what-if questions go to the ODE twin (Phase 3).
 
 ## Repository layout
 
@@ -102,6 +156,10 @@ uv run python -m validation.calibrate            # optional: re-run the calibrat
 uv run python -m validation.report               # validation report and figures
 uv run python -m data_gen.describe               # data dictionary and data card
 uv run python -m common.provenance               # list of literature values still to verify
+uv run python -m models.features                 # Phase 2: build model features (about 1 minute)
+uv run python -m models.train                    # train ladder + fusion models, write results/models (about 8 minutes)
+uv run python -m models.explain                  # explanations and their checks
+uv run python -m models.report                   # docs/model_report.md
 ```
 
 ## Responsible-data notes (DPDP-aware design)

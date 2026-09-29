@@ -1,0 +1,230 @@
+"""Write docs/model_report.md from results/models and results/explain (numbers from actual runs).
+
+    uv run python -m models.report
+"""
+
+from __future__ import annotations
+
+import json
+
+import pandas as pd
+
+from common import config
+
+RES = config.REPO_ROOT / "results"
+
+
+def _table(df: pd.DataFrame, digits: int = 3) -> str:
+    df = df.copy()
+    for c in df.columns:
+        if pd.api.types.is_float_dtype(df[c]):
+            df[c] = df[c].map(lambda v: "" if pd.isna(v) else f"{v:.{digits}f}".rstrip("0").rstrip(".") if abs(v) < 1000 else f"{v:,.0f}")
+    lines = ["| " + " | ".join(map(str, df.columns)) + " |", "|" + "---|" * len(df.columns)]
+    lines += ["| " + " | ".join(map(str, r)) + " |" for r in df.itertuples(index=False)]
+    return "\n".join(lines)
+
+
+def _boot_table() -> str:
+    path = RES / "models" / "ablation_bootstrap.csv"
+    if not path.exists():
+        return "_not run_"
+    b = pd.read_csv(path)
+    short = {"CGM only": "CGM", "CGM + wearables": "+wear", "CGM + wearables + EHR": "+EHR", "CGM + wearables + EHR + meal log": "+meal log"}
+    rows = ["| stratum | step | test rows | change in 60-min MAE (mg/dL) [95 % CI] | change in spike PR-AUC [95 % CI] |", "|---|---|---|---|---|"]
+    for r in b.itertuples(index=False):
+        step = f"{short[r._1]} -> {short[r.to]}"
+        rows.append(f"| {r.stratum} | {step} | {r.n_rows:,} | {r.delta_mae60:+.2f} [{r.mae60_ci_low:+.2f}, {r.mae60_ci_high:+.2f}] | "
+                    f"{r.delta_pr_auc:+.4f} [{r.pr_auc_ci_low:+.4f}, {r.pr_auc_ci_high:+.4f}] |")
+    return "\n".join(rows)
+
+
+def _calibration_note() -> str:
+    c = pd.read_csv(RES / "models" / "fusion_calibration.csv")
+    gap = c["observed_rate"] - c["mean_predicted"]
+    ece = float((gap.abs() * c["n"]).sum() / c["n"].sum())
+    worst = c.iloc[int(gap.abs().idxmax())]
+    return (f"Calibration on test patients: expected calibration error {ece:.3f}; largest gap in the bin around "
+            f"{worst['mean_predicted']:.2f} predicted vs {worst['observed_rate']:.2f} observed "
+            f"({'probabilities slightly too low' if gap.mean() > 0 else 'probabilities slightly too high'} on average; isotonic "
+            "calibration was fitted on the validation patients).")
+
+
+def _boot_findings() -> str:
+    path = RES / "models" / "ablation_bootstrap.csv"
+    if not path.exists():
+        return ""
+    b = pd.read_csv(path)
+    steps = {("CGM only", "CGM + wearables"): "Adding wearables", ("CGM + wearables", "CGM + wearables + EHR"): "Adding the EHR record",
+             ("CGM + wearables + EHR", "CGM + wearables + EHR + meal log"): "Adding the meal log"}
+    out = []
+    for (a, t), label in steps.items():
+        d = b[(b["from"] == a) & (b["to"] == t)]
+        parts = []
+        for r in d.itertuples(index=False):
+            if r.mae60_ci_high < 0 or r.mae60_ci_low > 0:
+                parts.append(f"{r.stratum}: 60-min MAE {r.delta_mae60:+.2f} mg/dL ({'better' if r.delta_mae60 < 0 else 'worse'})")
+            if r.pr_auc_ci_low > 0 or r.pr_auc_ci_high < 0:
+                parts.append(f"{r.stratum}: spike PR-AUC {r.delta_pr_auc:+.3f} ({'better' if r.delta_pr_auc > 0 else 'worse'})")
+        out.append(f"- **{label}:** " + ("; ".join(parts) if parts else "no effect distinguishable from zero in any stratum") + ".")
+    return "\n".join(out)
+
+
+def main() -> None:
+    abl_f = pd.read_csv(RES / "models" / "ablation_forecast.csv")
+    abl_c = pd.read_csv(RES / "models" / "ablation_spike.csv")
+    fus = pd.read_csv(RES / "models" / "fusion_forecast.csv")
+    sens = pd.read_csv(RES / "models" / "fusion_alert_sensitivity.csv")
+    summ = json.loads((RES / "models" / "summary.json").read_text(encoding="utf-8"))
+    exp_path = RES / "explain" / "explanation_checks.json"
+    exp = json.loads(exp_path.read_text(encoding="utf-8")) if exp_path.exists() else None
+
+    order = ["persistence", "linear extrapolation (30-min trend)", "CGM only", "CGM + wearables", "CGM + wearables + EHR", "CGM + wearables + EHR + meal log"]
+    mae = abl_f.pivot_table(index="model", columns="horizon_min", values="mae").reindex(order).dropna(how="all")
+    rmse = abl_f.pivot_table(index="model", columns="horizon_min", values="rmse").reindex(order).dropna(how="all")
+    mae.columns = [f"MAE {c} min" for c in mae.columns]
+    rmse.columns = [f"RMSE {c} min" for c in rmse.columns]
+    ladder = mae.join(rmse).reset_index()
+    cls = abl_c[["model", "pr_auc", "auroc", "brier", "prevalence"]]
+    cgm = abl_c.set_index("model")
+    fusion_name = "CGM + wearables + EHR + meal log"
+    d_pr = cgm.loc[fusion_name, "pr_auc"] - cgm.loc["CGM only", "pr_auc"]
+    m60 = abl_f[abl_f["horizon_min"] == 60].set_index("model")["mae"]
+    d_mae = m60.loc[fusion_name] - m60.loc["CGM only"]
+    ca, ev = summ["classification_at_threshold"], summ["events_at_threshold"]
+
+    lines = [
+        "# Model report (Phase 2)",
+        "",
+        "_Generated by `uv run python -m models.report` from `results/models/` and `results/explain/`. All numbers are from held-out "
+        f"**test patients** (patient-wise split; {summ['rows']['test']:,} prediction times every 5 minutes). Synthetic data only: "
+        "these results describe performance in the simulated world and are an upper bound for real patients (see the data card)._",
+        "",
+        "## Task",
+        "- **Forecast** CGM glucose 15-120 minutes ahead, with an 80 % band.",
+        "- **Detect** a spike: from a moment at or below 180 mg/dL, CGM above 180 for at least 15 minutes within the next 2 hours "
+        "(decision D-004). Prevalence among eligible test moments: "
+        f"{100 * abl_c['prevalence'].iloc[0]:.1f} %.",
+        "- Models: LightGBM on features built only from data up to the prediction time (a test checks this). Validation patients "
+        "choose early stopping, isotonic calibration, the conformal band width and the alert threshold.",
+        "",
+        "## Ablation ladder: does fusion help?",
+        "",
+        "![ablation](../results/models/ablation.png)",
+        "",
+        _table(ladder, 2),
+        "",
+        _table(cls),
+        "",
+        f"Going from CGM only to the full fusion model changes 60-minute MAE by {d_mae:+.2f} mg/dL and spike PR-AUC by {d_pr:+.3f}.",
+        "",
+        "**Paired differences with patient-level bootstrap 95 % intervals** (negative MAE change and positive PR-AUC change mean the "
+        "added stream helps; an interval that crosses zero means no clear effect). Strata: all test times; the first 24 h of each "
+        "patient's data (short CGM history); the first 3 h after waking (the day's sleep and stress not yet visible in glucose); "
+        "right after a walk (exercise effect).",
+        "",
+        _boot_table(),
+        "",
+        "What the intervals say (only effects whose 95 % interval excludes zero are listed):",
+        "",
+        _boot_findings(),
+        "",
+        "## Fusion model (CGM + wearables + EHR + meal log)",
+        "",
+        "![horizons](../results/models/horizon_mae.png)",
+        "",
+        _table(fus[["horizon_min", "mae", "rmse", "clarke_A", "clarke_B", "clarke_D", "band_coverage", "band_width_median"]], 3),
+        "",
+        "`band_coverage` is the share of test outcomes inside the 80 % band (target 0.80, set on validation patients by split-conformal "
+        "widening of quantile models). Clarke zones A+B are clinically acceptable; D means a missed high or low.",
+        "",
+        "### Spike alerts",
+        "",
+        f"Operating point chosen on validation patients (maximum F1): probability >= **{summ['threshold']:.2f}**.",
+        "",
+        "| measure (test) | value |",
+        "|---|---|",
+        f"| PR-AUC / AUROC | {ca['pr_auc']:.3f} / {ca['auroc']:.3f} |",
+        f"| Brier score (calibrated) | {ca['brier']:.3f} |",
+        f"| precision / recall per prediction time | {ca['precision']:.3f} / {ca['recall']:.3f} |",
+        f"| spike onsets caught (alert in the 2 h before) | {ev['onsets_detected']} of {ev['onsets']} ({100 * ev['event_recall']:.1f} %) |",
+        f"| lead time, median (mean) | {ev['median_lead_time_min']:.0f} min ({ev['mean_lead_time_min']:.0f} min) |",
+        f"| alert episodes followed by a spike | {100 * ev['episode_precision']:.1f} % |",
+        f"| false alert episodes per patient-day | {ev['false_alerts_per_patient_day']:.2f} |",
+        "",
+        "![calibration](../results/models/calibration.png) ![alerts](../results/models/alert_tradeoff.png)",
+        "",
+        _calibration_note(),
+        "",
+        "Sensitivity slider (what the dashboard offers; a higher threshold means fewer, more certain alerts):",
+        "",
+        _table(sens[["threshold", "precision", "recall", "event_recall", "median_lead_time_min", "episode_precision", "false_alerts_per_patient_day"]], 3),
+    ]
+    if exp:
+        lines += [
+            "",
+            "## Explanations (SHAP on the peak-glucose model)",
+            "",
+            "Contributions are in mg/dL of predicted 2-hour peak, relative to similar training patients (age +-10 y, diabetes duration "
+            "+-5 y), grouped into clinical concepts and shown as sentences (examples: [`docs/example_explanations.md`](example_explanations.md)). "
+            "They describe what the model relied on, not what would happen if something changed; what-if answers come from the ODE twin.",
+            "",
+            "![global](../results/explain/global_importance.png) ![fusion](../results/explain/dependence_meal_hba1c.png)",
+            "",
+            "**Checks against the simulator's hidden truth** (validation against the simulated world only):",
+            "",
+            "| check | group A | group B | mean A (mg/dL) | mean B (mg/dL) | expected | direction ok | p (Mann-Whitney) |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+        for name, c in exp["truth_contrasts"].items():
+            if "mean_a_mg_dl" not in c:
+                lines.append(f"| {name} | too few rows | | | | | | |")
+                continue
+            lines.append(f"| {name} | {c['group_a']} (n={c['n_a']}) | {c['group_b']} (n={c['n_b']}) | {c['mean_a_mg_dl']:+.1f} | "
+                         f"{c['mean_b_mg_dl']:+.1f} | {c['expected']} | {'yes' if c['direction_ok'] else 'NO'} | {c['mann_whitney_p']:.2g} |")
+        d, cs = exp["deletion"], exp["consistency"]
+        tc = exp["truth_contrasts"]
+        ac = exp.get("activity_context", {})
+        if "activity" in tc and not tc["activity"].get("direction_ok", True) and ac:
+            w, nw = ac["walked"], ac["did not walk"]
+            lines += ["", f"- **Activity (opposite to the naive expectation):** after a post-meal walk the current glucose is already lower "
+                      f"(median {w['median_current_glucose']:.0f} vs {nw['median_current_glucose']:.0f} mg/dL) and the actual rise to the 2-hour peak "
+                      f"is larger (median {w['median_actual_rise_to_2h_peak']:.0f} vs {nw['median_actual_rise_to_2h_peak']:.0f} mg/dL, n={w['n']} vs {nw['n']}): "
+                      "the walk suppresses glucose for a while and the rest of the meal is still being absorbed. The model learned that rebound, so "
+                      "'recent walking' raises the predicted rise from the current reading. This is the clearest example of why SHAP is never shown as "
+                      "the effect of an intervention; 'what if the patient walks' is answered by the ODE twin."]
+        if "insulin resistance" in tc and not tc["insulin resistance"].get("direction_ok", True):
+            lines += [f"- **Insulin resistance:** record-based concepts carry little weight in this model (mean |contribution| of all EHR "
+                      f"concepts together {exp['mean_abs_ehr_concepts_mg_dl']:.1f} mg/dL), and the contrast goes the wrong way by less than 1 mg/dL. "
+                      "The model reads the patient's physiology from the CGM history instead, matching the ablation (EHR adds no accuracy). "
+                      "The dashboard therefore shows record factors in the twin-state and profile panels rather than as alert drivers."]
+        lines += [
+            "",
+            f"- **Top-driver agreement:** after a logged meal of 60 g or more within 45 minutes, 'logged meals' is among the top-3 upward "
+            f"concepts in {100 * exp['top3_includes_meal_after_big_logged_meal']:.0f} % of cases (n={exp['n_big_meal_rows']}).",
+            f"- **Deletion test:** neutralising the top-3 concepts moves the prediction by {d['mean_abs_change_top3']:.1f} mg/dL on average, "
+            f"vs {d['mean_abs_change_random3']:.1f} for 3 random concepts; expected vs actual change correlate at {d['corr_expected_vs_actual_change']:.2f}.",
+            (f"- **Fusion interaction (meal x HbA1c):** for logged meals of 40-100 g within the hour, the meal's contribution changes by "
+             f"{exp['meal_hba1c_interaction']['slope_per_pct_hba1c']:+.2f} mg/dL per 1 % HbA1c (vs {exp['meal_hba1c_interaction']['slope_per_10g_carbs']:+.1f} "
+             f"per 10 g carbohydrate; n={exp['meal_hba1c_interaction']['n']}). "
+             + ("The model barely scales the meal effect by HbA1c; the patient-specific response is carried by the CGM history instead (see the dependence plot)."
+                if abs(exp['meal_hba1c_interaction']['slope_per_pct_hba1c']) < 1 else
+                "The meal's predicted effect grows with HbA1c: the model combines the record with the meal log.")) if "meal_hba1c_interaction" in exp else "",
+            f"- **Consistency:** explanations of similar moments in different patients have cosine similarity {cs['cosine_similar_moments']:.2f}, "
+            f"vs {cs['cosine_random_pairs']:.2f} for random pairs.",
+            "- **Clinician review:** pending (the example sentences are written for that review).",
+        ]
+    lines += [
+        "",
+        "## Limitations",
+        "- Trained and tested on synthetic patients; the simulator's assumptions are partly learnable by the model (circularity, see the data card). "
+        "The real-data TSTR check in `docs/validation_report.md` is CGM-only.",
+        "- Time-of-day features learn the synthetic Indian meal schedule; they will not transfer to a different schedule without retraining.",
+        "- The same validation patients drive early stopping and calibration (a separate calibration split would be cleaner).",
+        "- Alerts are evaluated per 5-minute prediction; the dashboard adds a 60-minute refractory period to limit repeats.",
+    ]
+    (config.REPO_ROOT / "docs" / "model_report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print("wrote docs/model_report.md")
+
+
+if __name__ == "__main__":
+    main()

@@ -12,7 +12,7 @@ Synthetic dataset: version v0.1, seed 20261020, 400 patients x 14 days. Real dat
 |---|---|---|---|---|---|
 | Shanghai T2DM (all) | 8.40 | 194 | 142 | 6.70 | 6.1 |
 | CGMacros T2D | 7.10 | 157 | 136 | 6.57 | 32.9 |
-| Synthetic cohort | 8.30 | 192 | 193 | 7.92 | 26.7 |
+| Synthetic cohort | 8.30 | 192 | 193 | 7.92 | 26.5 |
 
 In both real datasets the CGM recorded during the study sits below the level the recorded HbA1c implies (ADAG: eAG = 28.7 x HbA1c - 46.7): by 53 mg/dL at the median in Shanghai, where mean CGM barely rises with HbA1c (slope 6.1 mg/dL per %), and by 21 mg/dL in CGMacros, whose slope (32.9) is close to ADAG's 28.7 but offset lower (14 people only). The Shanghai recordings capture a monitored, treated period (half the patients were on insulin) rather than the 3-month average that HbA1c reflects. The synthetic cohort represents Indian outpatients whose HbA1c is current, so it is anchored to the ADAG relation on purpose. Comparing raw distributions would mostly measure this level difference, so the dynamics below are compared between real and synthetic patients **matched on mean CGM**.
 
@@ -20,14 +20,14 @@ Unmatched, for transparency (synthetic main cohort vs Shanghai held-out):
 
 | metric | real_median | real_q1 | real_q3 | synthetic_median | median_gap_in_real_iqr | ks_stat |
 |---|---|---|---|---|---|---|
-| mean | 139 | 115 | 156 | 193 | 1.306 | 0.661 |
-| gmi | 6.638 | 6.062 | 7.047 | 7.924 | 1.306 | 0.661 |
-| tir_70_180 | 0.835 | 0.705 | 0.91 | 0.47 | -1.782 | 0.62 |
-| cv | 0.267 | 0.237 | 0.314 | 0.248 | -0.239 | 0.211 |
-| mage | 92.213 | 75.171 | 108 | 102 | 0.306 | 0.253 |
-| pp_rise | 46.8 | 37.8 | 66.6 | 78.25 | 1.092 | 0.511 |
-| pp_time_to_peak | 90 | 75 | 105 | 100 | 0.35 | 0.411 |
-| spikes_per_day | 1.631 | 0.937 | 2.048 | 2.073 | 0.398 | 0.295 |
+| mean | 139 | 115 | 156 | 193 | 1.3 | 0.661 |
+| gmi | 6.638 | 6.062 | 7.047 | 7.918 | 1.3 | 0.661 |
+| tir_70_180 | 0.835 | 0.705 | 0.91 | 0.469 | -1.784 | 0.622 |
+| cv | 0.267 | 0.237 | 0.314 | 0.25 | -0.219 | 0.182 |
+| mage | 92.213 | 75.171 | 108 | 102 | 0.296 | 0.23 |
+| pp_rise | 46.8 | 37.8 | 66.6 | 77 | 1.049 | 0.505 |
+| pp_time_to_peak | 90 | 75 | 105 | 104 | 0.45 | 0.452 |
+| spikes_per_day | 1.631 | 0.937 | 2.048 | 2.073 | 0.398 | 0.292 |
 
 ## 2. Level-matched dynamics
 
@@ -35,56 +35,62 @@ Each held-out real patient is paired with the synthetic patient (from a 300-pati
 
 ![distributions](../results/validation/matched_distributions.png)
 
-**Shanghai held-out half** (metrics within 0.5 IQR: cv, mage, sd, tir_70_180, tar_180, nocturnal_to_mean, day_to_day_cv, diff_sd, diff2_sd, pp_rise, pp_time_to_peak, spikes_per_day)
+**Shanghai held-out half** (metrics within 0.5 IQR: cv, sd, tir_70_180, tar_180, nocturnal_to_mean, day_to_day_cv, diff_sd, diff2_sd, diff_p95, pp_rise, pp_time_to_peak, spikes_per_day)
 
 | metric | real_median | real_q1 | real_q3 | synthetic_median | median_gap_in_real_iqr | ks_stat |
 |---|---|---|---|---|---|---|
-| cv | 0.267 | 0.237 | 0.314 | 0.258 | -0.115 | 0.163 |
-| mage | 92.213 | 75.171 | 108 | 80.05 | -0.367 | 0.265 |
-| sd | 35.78 | 31.338 | 44.931 | 36.305 | 0.039 | 0.122 |
-| tir_70_180 | 0.835 | 0.705 | 0.91 | 0.826 | -0.043 | 0.102 |
-| tar_180 | 0.141 | 0.053 | 0.215 | 0.132 | -0.054 | 0.143 |
-| nocturnal_to_mean | 0.819 | 0.77 | 0.887 | 0.835 | 0.136 | 0.184 |
-| day_to_day_cv | 0.107 | 0.065 | 0.171 | 0.096 | -0.099 | 0.286 |
-| diff_sd | 9.636 | 7.872 | 10.714 | 8.612 | -0.36 | 0.204 |
-| diff2_sd | 7.502 | 6.2 | 8.24 | 6.978 | -0.257 | 0.163 |
-| pp_rise | 46.8 | 37.8 | 66.6 | 60.5 | 0.476 | 0.321 |
-| pp_time_to_peak | 90 | 75 | 105 | 94.25 | 0.142 | 0.221 |
-| spikes_per_day | 1.631 | 0.937 | 2.048 | 1.602 | -0.026 | 0.122 |
+| cv | 0.267 | 0.237 | 0.314 | 0.263 | -0.049 | 0.143 |
+| mage | 92.213 | 75.171 | 108 | 75.237 | -0.512 | 0.286 |
+| sd | 35.78 | 31.338 | 44.931 | 36.015 | 0.017 | 0.122 |
+| tir_70_180 | 0.835 | 0.705 | 0.91 | 0.831 | -0.022 | 0.102 |
+| tar_180 | 0.141 | 0.053 | 0.215 | 0.12 | -0.13 | 0.102 |
+| nocturnal_to_mean | 0.819 | 0.77 | 0.887 | 0.821 | 0.02 | 0.143 |
+| day_to_day_cv | 0.107 | 0.065 | 0.171 | 0.093 | -0.124 | 0.245 |
+| diff_sd | 9.636 | 7.872 | 10.714 | 8.519 | -0.393 | 0.245 |
+| diff2_sd | 7.502 | 6.2 | 8.24 | 7.961 | 0.225 | 0.245 |
+| diff_p05 | -14.4 | -16.2 | -12.6 | -11 | 0.944 | 0.49 |
+| diff_p95 | 16.2 | 14.4 | 19.8 | 16 | -0.037 | 0.184 |
+| pp_rise | 46.8 | 37.8 | 66.6 | 58 | 0.389 | 0.316 |
+| pp_time_to_peak | 90 | 75 | 105 | 93 | 0.1 | 0.26 |
+| spikes_per_day | 1.631 | 0.937 | 2.048 | 1.602 | -0.026 | 0.082 |
 
-**CGMacros T2D, external** (metrics within 0.5 IQR: cv, sd, tir_70_180, tar_180, nocturnal_to_mean, day_to_day_cv, diff2_sd, pp_rise, spikes_per_day)
+**CGMacros T2D, external** (metrics within 0.5 IQR: cv, sd, tir_70_180, tar_180, nocturnal_to_mean, diff_sd, diff2_sd, diff_p95, pp_rise, spikes_per_day)
 
 | metric | real_median | real_q1 | real_q3 | synthetic_median | median_gap_in_real_iqr | ks_stat |
 |---|---|---|---|---|---|---|
-| cv | 0.278 | 0.246 | 0.318 | 0.261 | -0.235 | 0.214 |
-| mage | 106 | 82.883 | 123 | 84.033 | -0.54 | 0.429 |
-| sd | 40.145 | 29.442 | 47.738 | 36.409 | -0.204 | 0.286 |
-| tir_70_180 | 0.819 | 0.746 | 0.947 | 0.897 | 0.384 | 0.286 |
-| tar_180 | 0.115 | 0.044 | 0.253 | 0.095 | -0.097 | 0.286 |
-| nocturnal_to_mean | 0.835 | 0.809 | 0.918 | 0.782 | -0.487 | 0.429 |
-| day_to_day_cv | 0.078 | 0.064 | 0.102 | 0.085 | 0.17 | 0.286 |
-| diff_sd | 10.895 | 9.522 | 12.414 | 8.636 | -0.781 | 0.429 |
-| diff2_sd | 8.307 | 7.591 | 9.083 | 7.851 | -0.305 | 0.214 |
-| pp_rise | 65.75 | 44.75 | 73.125 | 52.25 | -0.476 | 0.243 |
-| pp_time_to_peak | 78.75 | 73.625 | 89.375 | 88.5 | 0.619 | 0.343 |
-| spikes_per_day | 1.595 | 0.946 | 2.452 | 1.452 | -0.096 | 0.143 |
+| cv | 0.278 | 0.246 | 0.318 | 0.271 | -0.104 | 0.214 |
+| mage | 106 | 82.883 | 123 | 78.64 | -0.673 | 0.5 |
+| sd | 40.145 | 29.442 | 47.738 | 36.091 | -0.222 | 0.286 |
+| tir_70_180 | 0.819 | 0.746 | 0.947 | 0.839 | 0.099 | 0.143 |
+| tar_180 | 0.115 | 0.044 | 0.253 | 0.122 | 0.031 | 0.214 |
+| nocturnal_to_mean | 0.835 | 0.809 | 0.918 | 0.785 | -0.462 | 0.5 |
+| day_to_day_cv | 0.078 | 0.064 | 0.102 | 0.098 | 0.515 | 0.357 |
+| diff_sd | 10.895 | 9.522 | 12.414 | 9.453 | -0.499 | 0.357 |
+| diff2_sd | 8.307 | 7.591 | 9.083 | 8.359 | 0.035 | 0.214 |
+| diff_p05 | -17 | -18.75 | -15.25 | -11 | 1.714 | 0.643 |
+| diff_p95 | 20 | 15.475 | 21.887 | 17 | -0.468 | 0.214 |
+| pp_rise | 65.75 | 44.75 | 73.125 | 69 | 0.115 | 0.26 |
+| pp_time_to_peak | 78.75 | 73.625 | 89.375 | 98 | 1.222 | 0.422 |
+| spikes_per_day | 1.595 | 0.946 | 2.452 | 1.652 | 0.037 | 0.357 |
 
 For reference, the same comparison on the calibration half that the tuning saw:
 
 | metric | real_median | real_q1 | real_q3 | synthetic_median | median_gap_in_real_iqr | ks_stat |
 |---|---|---|---|---|---|---|
-| cv | 0.294 | 0.254 | 0.345 | 0.278 | -0.18 | 0.229 |
-| mage | 95.585 | 78.467 | 117 | 90.342 | -0.136 | 0.167 |
-| sd | 40.737 | 33.298 | 53.774 | 38.569 | -0.106 | 0.208 |
-| tir_70_180 | 0.841 | 0.66 | 0.894 | 0.824 | -0.074 | 0.125 |
-| tar_180 | 0.151 | 0.07 | 0.332 | 0.164 | 0.05 | 0.146 |
-| nocturnal_to_mean | 0.811 | 0.761 | 0.9 | 0.825 | 0.1 | 0.208 |
-| day_to_day_cv | 0.143 | 0.096 | 0.192 | 0.087 | -0.58 | 0.5 |
-| diff_sd | 9.736 | 7.753 | 11.245 | 9.874 | 0.039 | 0.146 |
-| diff2_sd | 7.354 | 6.399 | 8.474 | 7.687 | 0.161 | 0.104 |
-| pp_rise | 44.1 | 26.55 | 63.9 | 77.75 | 0.901 | 0.431 |
-| pp_time_to_peak | 90 | 75 | 105 | 89 | -0.033 | 0.292 |
-| spikes_per_day | 1.498 | 0.96 | 2.051 | 2.002 | 0.462 | 0.271 |
+| cv | 0.294 | 0.254 | 0.345 | 0.263 | -0.342 | 0.312 |
+| mage | 95.585 | 78.467 | 117 | 82.498 | -0.341 | 0.375 |
+| sd | 40.737 | 33.298 | 53.774 | 37.402 | -0.163 | 0.271 |
+| tir_70_180 | 0.841 | 0.66 | 0.894 | 0.829 | -0.051 | 0.125 |
+| tar_180 | 0.151 | 0.07 | 0.332 | 0.161 | 0.037 | 0.125 |
+| nocturnal_to_mean | 0.811 | 0.761 | 0.9 | 0.836 | 0.178 | 0.188 |
+| day_to_day_cv | 0.143 | 0.096 | 0.192 | 0.086 | -0.59 | 0.583 |
+| diff_sd | 9.736 | 7.753 | 11.245 | 8.587 | -0.329 | 0.167 |
+| diff2_sd | 7.354 | 6.399 | 8.474 | 8.107 | 0.363 | 0.229 |
+| diff_p05 | -14.4 | -16.2 | -12.15 | -11 | 0.84 | 0.396 |
+| diff_p95 | 16.2 | 14.4 | 21.6 | 16.3 | 0.014 | 0.146 |
+| pp_rise | 44.1 | 26.55 | 63.9 | 65 | 0.56 | 0.425 |
+| pp_time_to_peak | 90 | 75 | 105 | 104 | 0.467 | 0.333 |
+| spikes_per_day | 1.498 | 0.96 | 2.051 | 1.902 | 0.371 | 0.25 |
 
 ![post-meal](../results/validation/postprandial_curves.png)
 
@@ -96,17 +102,17 @@ LightGBM on summary features of 12-hour CGM windows, patient-grouped 5-fold cros
 
 | comparison | windows | real patients | synthetic patients | accuracy | AUC | most useful features |
 |---|---|---|---|---|---|---|
-| level-matched synthetic vs held-out real | 2232 | 63 | 63 | 0.883 | 0.946 | diff_min, acf_8, diff_max, second_diff_sd |
-| main synthetic cohort (unmatched) vs held-out real | 2702 | 63 | 60 | 0.919 | 0.975 | min, diff_min, mean, p10 |
+| level-matched synthetic vs held-out real | 2228 | 63 | 63 | 0.881 | 0.950 | diff_min, acf_8, acf_2, power_high |
+| main synthetic cohort (unmatched) vs held-out real | 2702 | 63 | 60 | 0.918 | 0.977 | min, diff_min, mean, second_diff_sd |
 
 The simulator is still easy to tell apart window by window. Median values of the strongest cues (level-matched run):
 
 | feature | real | synthetic |
 |---|---|---|
-| diff_min | -19.8 | -14 |
-| acf_8 | 0.0346 | -0.109 |
-| diff_max | 25.2 | 23 |
-| second_diff_sd | 7.06 | 5.61 |
+| diff_min | -19.8 | -15 |
+| acf_8 | 0.0387 | -0.0876 |
+| acf_2 | 0.783 | 0.782 |
+| power_high | 0.00983 | 0.0144 |
 
 `diff_min` is the steepest 15-minute fall in a 12-hour window. Real glucose falls faster after peaks than the simulator's, and not only in insulin users:
 
@@ -114,7 +120,7 @@ The simulator is still easy to tell apart window by window. Median values of the
 |---|---|---|---|
 | real, on insulin | 17 | 367 | -18.0 |
 | real, no insulin | 32 | 778 | -19.8 |
-| synthetic (matched) | 49 | 865 | -14.0 |
+| synthetic (matched) | 49 | 868 | -15.0 |
 
 Candidate fixes for the next generator iteration: faster insulin action (p2) or a sharper meal-absorption tail, with post-peak fall rate added to the calibration targets.
 
@@ -122,8 +128,8 @@ Candidate fixes for the next generator iteration: faster insulin action (p2) or 
 
 CGM-only tasks (the real datasets have no wearables): glucose 30 and 60 min ahead (MAE/RMSE, mg/dL) and onset of glucose > 180 mg/dL for at least 15 min within 2 h, from windows starting at or below 180 (AUROC, PR-AUC). The TRTR row trains on the real calibration half; it is a yardstick inside `validation/` only. Each model is trained twice: on CGM history only, and with time-of-day features. Real Shanghai meals follow a hospital timetable (breakfast ~07:00, lunch ~11:00, dinner ~17:00) while the synthetic patients eat on an Indian home schedule (lunch ~13:30, dinner ~21:00), so clock features do not transfer; the CGM-history-only rows are the fair TSTR test.
 
-- **Shanghai held-out**: 60-min MAE 19.2 mg/dL when trained on synthetic data vs 19.9 for persistence and 17.5 when trained on real data; spike PR-AUC 0.333 vs 0.282 (persistence) and 0.375 (real); AUROC 0.707 vs 0.746 and 0.772.
-- **CGMacros T2D**: 60-min MAE 21.3 mg/dL when trained on synthetic data vs 22.3 for persistence and 19.4 when trained on real data; spike PR-AUC 0.328 vs 0.290 (persistence) and 0.376 (real); AUROC 0.681 vs 0.713 and 0.735.
+- **Shanghai held-out**: 60-min MAE 18.7 mg/dL when trained on synthetic data vs 19.9 for persistence and 17.5 when trained on real data; spike PR-AUC 0.336 vs 0.282 (persistence) and 0.375 (real); AUROC 0.713 vs 0.746 and 0.772.
+- **CGMacros T2D**: 60-min MAE 20.9 mg/dL when trained on synthetic data vs 22.3 for persistence and 19.4 when trained on real data; spike PR-AUC 0.340 vs 0.290 (persistence) and 0.376 (real); AUROC 0.698 vs 0.713 and 0.735.
 
 | train | features | test | mae_30 | mae_60 | rmse_60 | spike_auroc | spike_pr_auc | spike_rate | n_samples |
 |---|---|---|---|---|---|---|---|---|---|
@@ -131,14 +137,14 @@ CGM-only tasks (the real datasets have no wearables): glucose 30 and 60 min ahea
 | linear extrapolation (no training) | - | Shanghai held-out | 13.314 | 27.079 | 39.799 | 0.742 | 0.31 | 0.117 | 28400 |
 | persistence (no training) | - | CGMacros T2D | 13.339 | 22.324 | 33.689 | 0.713 | 0.29 | 0.132 | 7169 |
 | linear extrapolation (no training) | - | CGMacros T2D | 15.168 | 31.345 | 46.873 | 0.724 | 0.334 | 0.132 | 7169 |
-| synthetic main cohort (train split) | CGM history only | Shanghai held-out | 11.305 | 19.2 | 27.567 | 0.707 | 0.333 | 0.117 | 28400 |
-| synthetic main cohort (train split) | CGM history only | CGMacros T2D | 12.442 | 21.316 | 31.546 | 0.681 | 0.328 | 0.132 | 7169 |
-| synthetic main cohort (train split) | CGM history + time of day | Shanghai held-out | 11.343 | 21.157 | 29.665 | 0.699 | 0.248 | 0.117 | 28400 |
-| synthetic main cohort (train split) | CGM history + time of day | CGMacros T2D | 12.285 | 22.404 | 32.189 | 0.711 | 0.273 | 0.132 | 7169 |
-| synthetic level-matched pool | CGM history only | Shanghai held-out | 10.969 | 18.799 | 27.169 | 0.702 | 0.333 | 0.117 | 28400 |
-| synthetic level-matched pool | CGM history only | CGMacros T2D | 12.019 | 20.912 | 31.127 | 0.683 | 0.337 | 0.132 | 7169 |
-| synthetic level-matched pool | CGM history + time of day | Shanghai held-out | 11.111 | 20.174 | 28.414 | 0.693 | 0.251 | 0.117 | 28400 |
-| synthetic level-matched pool | CGM history + time of day | CGMacros T2D | 12.068 | 21.66 | 31.3 | 0.716 | 0.291 | 0.132 | 7169 |
+| synthetic main cohort (train split) | CGM history only | Shanghai held-out | 11.081 | 18.734 | 27.112 | 0.713 | 0.336 | 0.117 | 28400 |
+| synthetic main cohort (train split) | CGM history only | CGMacros T2D | 12.268 | 20.895 | 31.224 | 0.698 | 0.34 | 0.132 | 7169 |
+| synthetic main cohort (train split) | CGM history + time of day | Shanghai held-out | 11.333 | 21.144 | 29.553 | 0.695 | 0.237 | 0.117 | 28400 |
+| synthetic main cohort (train split) | CGM history + time of day | CGMacros T2D | 12.33 | 22.415 | 32.097 | 0.711 | 0.267 | 0.132 | 7169 |
+| synthetic level-matched pool | CGM history only | Shanghai held-out | 10.821 | 18.431 | 26.834 | 0.714 | 0.337 | 0.117 | 28400 |
+| synthetic level-matched pool | CGM history only | CGMacros T2D | 11.883 | 20.542 | 30.854 | 0.691 | 0.343 | 0.132 | 7169 |
+| synthetic level-matched pool | CGM history + time of day | Shanghai held-out | 11.043 | 20.033 | 28.186 | 0.696 | 0.249 | 0.117 | 28400 |
+| synthetic level-matched pool | CGM history + time of day | CGMacros T2D | 12.017 | 21.53 | 31.109 | 0.72 | 0.285 | 0.132 | 7169 |
 | real Shanghai calibration half (TRTR) | CGM history only | Shanghai held-out | 10.048 | 17.512 | 25.674 | 0.772 | 0.375 | 0.117 | 28400 |
 | real Shanghai calibration half (TRTR) | CGM history only | CGMacros T2D | 10.974 | 19.368 | 29.425 | 0.735 | 0.376 | 0.132 | 7169 |
 | real Shanghai calibration half (TRTR) | CGM history + time of day | Shanghai held-out | 9.84 | 16.781 | 24.512 | 0.853 | 0.463 | 0.117 | 28400 |
@@ -146,16 +152,17 @@ CGM-only tasks (the real datasets have no wearables): glucose 30 and 60 min ahea
 
 ## 5. Calibration
 
-`validation/calibrate.py` searched 6 population-level settings on the Shanghai calibration half only (random search, fixed seed). Loss (weighted squared median gaps in real-IQR units) went from 41.16 with the hand-set defaults to 0.54. Chosen values (`configs/calibrated.yaml`):
+`validation/calibrate.py` searched 7 population-level settings on the Shanghai calibration half only (random search, fixed seed). Loss (weighted squared median gaps in real-IQR units) went from 47.10 with the hand-set defaults to 0.88. Chosen values (`configs/calibrated.yaml`):
 
 | setting | value |
 |---|---|
-| `physiology.gut.absorption_speed_scale` | 0.8083 |
-| `physiology.latent.fasting.fasting_to_mean_ratio` | 0.6507 |
-| `physiology.day_to_day.si_ar_sd` | 0.1629 |
-| `sensors.cgm.noise_sd_mgdl` | 1.735 |
-| `sensors.cgm.noise_multiplicative_sd` | 0.01157 |
-| `sensors.cgm.noise_rho` | 0.8976 |
+| `physiology.gut.absorption_speed_scale` | 0.7834 |
+| `physiology.latent.fasting.fasting_to_mean_ratio` | 0.6276 |
+| `physiology.insulin.p2_per_min` | 0.0363 |
+| `physiology.day_to_day.si_ar_sd` | 0.1798 |
+| `sensors.cgm.noise_sd_mgdl` | 1.029 |
+| `sensors.cgm.noise_multiplicative_sd` | 0.025 |
+| `sensors.cgm.noise_rho` | 0.9005 |
 
 ## 6. Limitations
 

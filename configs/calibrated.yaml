@@ -1,18 +1,20 @@
 note: Written by validation/calibrate.py; tuned on the Shanghai calibration split
   only.
-loss_default: 41.156
-loss_best: 0.5372
+loss_default: 47.1033
+loss_best: 0.8807
 overlays:
   physiology:
     gut:
-      absorption_speed_scale: 0.8082817813839555
+      absorption_speed_scale: 0.7833551652964011
     latent:
       fasting:
-        fasting_to_mean_ratio: 0.6506978574308055
+        fasting_to_mean_ratio: 0.6276338846609145
+    insulin:
+      p2_per_min: 0.03630361795161434
     day_to_day:
-      si_ar_sd: 0.1629236185312198
+      si_ar_sd: 0.1797825792436865
   sensors:
     cgm:
-      noise_sd_mgdl: 1.73549304940742
-      noise_multiplicative_sd: 0.011574022041467017
-      noise_rho: 0.8976217482874148
+      noise_sd_mgdl: 1.0287629595399774
+      noise_multiplicative_sd: 0.025
+      noise_rho: 0.9005120349423916

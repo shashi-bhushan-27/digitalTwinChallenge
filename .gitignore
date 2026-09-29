@@ -25,3 +25,8 @@ Thumbs.db
 CLAUDE.md
 BUILD_PROMPT.md
 .claude/
+
+# Derived features and trained models (rebuilt with one command each)
+data/features/
+models/artifacts/
+results/models/test_predictions.parquet

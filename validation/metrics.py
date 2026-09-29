@@ -98,6 +98,9 @@ def patient_summaries(cgm: pd.DataFrame) -> pd.DataFrame:
         # lag-1 autocorrelation of first differences (smoothness of the trace)
         diffs = d.set_index("timestamp")["glucose_mgdl"].diff().dropna().to_numpy()
         s["diff_sd"] = diffs.std() if len(diffs) > 2 else np.nan
+        # tails of the step changes: how fast glucose falls after peaks and rises after meals
+        s["diff_p05"] = np.percentile(diffs, 5) if len(diffs) > 20 else np.nan
+        s["diff_p95"] = np.percentile(diffs, 95) if len(diffs) > 20 else np.nan
         # roughness: SD of second differences (sensor noise and smoothing show up here)
         s["diff2_sd"] = np.diff(diffs).std() if len(diffs) > 3 else np.nan
         s["patient_id"] = pid

@@ -3,70 +3,70 @@
     "top_feature_medians": {
       "diff_min": {
         "real": -19.799999999999997,
-        "synthetic": -14.0
+        "synthetic": -15.0
       },
       "acf_8": {
-        "real": 0.03459684362816597,
-        "synthetic": -0.10932246804145515
+        "real": 0.03871351884413486,
+        "synthetic": -0.08764522278912434
       },
-      "diff_max": {
-        "real": 25.200000000000017,
-        "synthetic": 23.0
+      "acf_2": {
+        "real": 0.7833057474146218,
+        "synthetic": 0.78168107374736
       },
-      "second_diff_sd": {
-        "real": 7.058027699434631,
-        "synthetic": 5.605934980902832
+      "power_high": {
+        "real": 0.009834117960063024,
+        "synthetic": 0.014439568350629583
       }
     },
-    "n_windows": 2232,
+    "n_windows": 2228,
     "n_real_patients": 63,
     "n_synthetic_patients": 63,
-    "accuracy": 0.8830645161290323,
-    "auc": 0.945574151154276,
+    "accuracy": 0.8810592459605027,
+    "auc": 0.9503697030449737,
     "top_features": {
-      "diff_min": 0.307,
-      "acf_8": 0.111,
-      "diff_max": 0.076,
+      "diff_min": 0.325,
+      "acf_8": 0.085,
+      "acf_2": 0.066,
+      "power_high": 0.062,
       "second_diff_sd": 0.059,
-      "acf_2": 0.053,
-      "power_high": 0.048,
-      "min": 0.04,
-      "acf_4": 0.04
+      "diff_max": 0.059,
+      "acf_4": 0.043,
+      "diff_sd": 0.036
     }
   },
   "unmatched_main_cohort": {
     "top_feature_medians": {
       "min": {
         "real": 90.0,
-        "synthetic": 143.0
+        "synthetic": 142.0
       },
       "diff_min": {
         "real": -19.80000000000001,
-        "synthetic": -15.0
+        "synthetic": -17.0
       },
       "mean": {
         "real": 132.0,
-        "synthetic": 200.5625
+        "synthetic": 199.89583333333334
       },
-      "p10": {
-        "real": 99.72,
-        "synthetic": 153.0
+      "second_diff_sd": {
+        "real": 7.074713350949962,
+        "synthetic": 8.296291334414555
       }
     },
     "n_windows": 2702,
     "n_real_patients": 63,
     "n_synthetic_patients": 60,
-    "accuracy": 0.9185788304959289,
-    "auc": 0.9748318130441525,
+    "accuracy": 0.9182087342709104,
+    "auc": 0.9767077708153786,
     "top_features": {
-      "min": 0.292,
-      "diff_min": 0.156,
-      "mean": 0.097,
-      "p10": 0.05,
-      "diff_max": 0.041,
-      "second_diff_sd": 0.04,
-      "acf_8": 0.039,
-      "diff_abs_mean": 0.037
+      "min": 0.256,
+      "diff_min": 0.143,
+      "mean": 0.125,
+      "second_diff_sd": 0.053,
+      "power_high": 0.052,
+      "p10": 0.041,
+      "acf_8": 0.038,
+      "acf_2": 0.037
     }
   }
 }

@@ -68,15 +68,27 @@ def main() -> None:
 
     results = []
     tic = time.time()
-    for i, cand in enumerate(candidates):
+
+    def run_candidate(cand: dict, label: str) -> None:
         overlays: dict = {}
         for k, v in cand.items():
             cfg_name, rest = k.split(".", 1)
             _set(overlays.setdefault(cfg_name, {}), rest, v)
         score, table = evaluate(overlays, vcfg, real, cal["n_patients"], cal["n_days"])
         results.append((score, cand, overlays, table))
-        print(f"[calibrate] {i + 1:2d}/{len(candidates)} loss={score:7.3f} " + " ".join(f"{k.split('.')[-1]}={v:.3g}" for k, v in cand.items())
+        print(f"[calibrate] {label} loss={score:7.3f} " + " ".join(f"{k.split('.')[-1]}={v:.3g}" for k, v in cand.items())
               + f" ({time.time() - tic:.0f}s)")
+
+    for i, cand in enumerate(candidates):
+        run_candidate(cand, f"{i + 1:2d}/{len(candidates)}")
+    # local refinement: log-normal steps around the current best, clipped to the ranges
+    for j in range(cal.get("n_refine", 0)):
+        best = min(results, key=lambda x: x[0])[1]
+        cand = {}
+        for k, (lo, hi) in cal["search"].items():
+            step = cal["refine_sd"] * (np.log(hi) - np.log(lo))
+            cand[k] = float(np.clip(np.exp(np.log(best[k]) + r.normal(0, step)), lo, hi))
+        run_candidate(cand, f"refine {j + 1:2d}/{cal['n_refine']}")
 
     results.sort(key=lambda x: x[0])
     best_score, best, overlays, table = results[0]

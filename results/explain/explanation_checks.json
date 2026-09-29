@@ -1,0 +1,98 @@
+{
+  "truth_contrasts": {
+    "logged meal": {
+      "group_a": "large meal (>= 60 g) logged within 45 min",
+      "group_b": "no meal logged in the last 4 h (daytime)",
+      "mean_a_mg_dl": 36.71345934691344,
+      "mean_b_mg_dl": -1.4785113575458477,
+      "difference": 38.19197070445929,
+      "expected": "a > b",
+      "direction_ok": true,
+      "mann_whitney_p": 0.0,
+      "n_a": 922,
+      "n_b": 11296
+    },
+    "activity": {
+      "group_a": ">= 1500 steps in the last hour, 30-120 min after a logged meal",
+      "group_b": "<= 300 steps, same post-meal window",
+      "mean_a_mg_dl": 0.8242447621372626,
+      "mean_b_mg_dl": 0.3028551818766541,
+      "difference": 0.5213895802606086,
+      "expected": "b > a",
+      "direction_ok": false,
+      "mann_whitney_p": 2.0228133519069493e-19,
+      "n_a": 198,
+      "n_b": 2676
+    },
+    "sleep": {
+      "group_a": "hidden sleep < 5.5 h last night",
+      "group_b": "hidden sleep >= 7.5 h",
+      "mean_a_mg_dl": 0.4416711195031473,
+      "mean_b_mg_dl": 0.0822785562932498,
+      "difference": 0.3593925632098975,
+      "expected": "a > b",
+      "direction_ok": true,
+      "mann_whitney_p": 1.046660664216143e-106,
+      "n_a": 2373,
+      "n_b": 5912
+    },
+    "insulin resistance": {
+      "group_a": "hidden insulin sensitivity, lowest third",
+      "group_b": "highest third (daytime, glucose 120-180)",
+      "mean_a_mg_dl": -0.1324692536391519,
+      "mean_b_mg_dl": 0.632664559896616,
+      "difference": -0.7651338135357679,
+      "expected": "a > b",
+      "direction_ok": false,
+      "mann_whitney_p": 5.7256733389904595e-19,
+      "n_a": 1817,
+      "n_b": 2363
+    }
+  },
+  "activity_context": {
+    "walked": {
+      "n": 1570,
+      "median_current_glucose": 214.0,
+      "median_actual_rise_to_2h_peak": 29.0
+    },
+    "did not walk": {
+      "n": 19816,
+      "median_current_glucose": 237.0,
+      "median_actual_rise_to_2h_peak": 13.0
+    }
+  },
+  "mean_abs_ehr_concepts_mg_dl": 4.452195934543848,
+  "meal_hba1c_interaction": {
+    "n": 1525,
+    "slope_per_pct_hba1c": 0.29578893505881193,
+    "slope_per_10g_carbs": 3.3370061376811955
+  },
+  "top3_includes_meal_after_big_logged_meal": 0.9978308026030369,
+  "n_big_meal_rows": 922,
+  "deletion": {
+    "mean_abs_change_top3": 19.548158552101267,
+    "mean_abs_change_random3": 5.597842502588393,
+    "corr_expected_vs_actual_change": 0.9737104967654242
+  },
+  "consistency": {
+    "cosine_similar_moments": 0.7489681186082197,
+    "cosine_random_pairs": 0.040421783544116456
+  },
+  "global": {
+    "time_of_day": 12.489516948483912,
+    "glucose_now": 9.763536850713113,
+    "recent_meal": 3.776101267764669,
+    "glucose_day": 3.078085972992164,
+    "glucose_hours": 2.1896452685434564,
+    "medications": 2.051220109712177,
+    "body_liver": 0.8861420616180461,
+    "activity": 0.6911415185486557,
+    "profile": 0.6780597624955459,
+    "baseline_control": 0.6712960093498388,
+    "recovery": 0.42471338838269435,
+    "kidney": 0.16547799136824068,
+    "sleep": 0.1338819852192258,
+    "heart_rate": 0.07800825468753074,
+    "data_quality": 0.05774290389756058
+  }
+}

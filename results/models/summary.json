@@ -1,0 +1,43 @@
+{
+  "classification_at_threshold": {
+    "model": "CGM + wearables + EHR + meal log",
+    "prevalence": 0.34853784652820025,
+    "n": 92056,
+    "pr_auc": 0.8482453889720838,
+    "auroc": 0.9149746786735192,
+    "brier": 0.11517182968615487,
+    "threshold": 0.35999999999999993,
+    "precision": 0.7302246025292319,
+    "recall": 0.8116565373227365,
+    "f1": 0.7687902225895968,
+    "alert_rate": 0.38740549230902926
+  },
+  "events_at_threshold": {
+    "threshold": 0.35999999999999993,
+    "onsets": 1740,
+    "onsets_detected": 1668,
+    "event_recall": 0.9586206896551724,
+    "median_lead_time_min": 95.0,
+    "mean_lead_time_min": 84.45143884892086,
+    "alert_episodes": 1883,
+    "false_alert_episodes": 831,
+    "episode_precision": 0.5586829527349974,
+    "false_alerts_per_patient_day": 1.00756532831504,
+    "patient_days": 824.7604166666674
+  },
+  "threshold": 0.35999999999999993,
+  "conformal_offsets": {
+    "15": 0.22602742593795552,
+    "30": 0.46199228705185313,
+    "60": 0.9253207545047145,
+    "90": 1.4378279023985288,
+    "120": 1.9710779175495534,
+    "peak_120": 0.37433036389874863
+  },
+  "rows": {
+    "train": 359307,
+    "val": 76881,
+    "test": 230609
+  },
+  "runtime_s": 458
+}

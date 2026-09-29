@@ -1,0 +1,49 @@
+# Phase 2: prediction models. Design choices (docs/decisions.md D-020 onwards).
+seed: 11
+
+spike:                     # confirmed definition (D-004)
+  threshold_mgdl: 180
+  sustain_min: 15
+  window_min: 120
+
+horizons_min: [15, 30, 60, 90, 120]
+ablation_horizons_min: [30, 60, 120]
+quantiles: [0.1, 0.5, 0.9]       # 80 % band; widened on validation data (split conformal) to cover ~80 %
+band_coverage: 0.8
+
+sampling:
+  grid_min: 5
+  train_stride_min: 15     # train/val prediction times every 15 min
+  eval_stride_min: 5       # test prediction times every 5 min (continuous alert stream)
+  min_history_min: 360     # need 6 h of CGM history before the first prediction
+  peak_min_coverage: 0.7
+
+features:
+  cgm_lags_min: [5, 10, 15, 30, 45, 60, 90, 120]
+  cgm_windows_min: [60, 180, 360]
+  steps_windows_min: [15, 30, 60, 120]
+  meal_windows_min: [120, 240]
+  sleep_episode_min_h: 3.0
+  sleep_gap_merge_min: 30
+
+lgb:
+  learning_rate: 0.06
+  num_leaves: 63
+  min_data_in_leaf: 100
+  feature_fraction: 0.8
+  bagging_fraction: 0.8
+  bagging_freq: 1
+  lambda_l2: 1.0
+  num_boost_round: 1200
+  early_stopping_rounds: 50
+  num_threads: 10
+
+alerts:
+  refractory_min: 60       # a new alert episode starts only after 60 min without alerts
+  sensitivity_grid: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7]   # probability thresholds for the dashboard slider
+
+explain:
+  background_size: 100     # shap's interventional masker uses at most 100 rows by default
+  age_band_yr: 10
+  duration_band_yr: 5
+  n_eval_samples: 30000    # rows for the truth contrasts; deletion and consistency use subsets
