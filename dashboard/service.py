@@ -197,7 +197,7 @@ def hba1c_history(dd: DemoData, pid: str) -> pd.DataFrame:
 def triage(dd: DemoData, t: pd.Timestamp, threshold: float) -> pd.DataFrame:
     """All demo patients at clinic time t, ranked by severity (predicted lows first, then the highest
     predicted 2-hour peak), with a one-line reason."""
-    from models.explain import GROUPS, global_contributions, reroute_missing, sentence
+    from models.explain import global_contributions, reroute_missing, sentence
 
     rows, feats = [], []
     for pid in dd.patient_ids:
@@ -211,9 +211,10 @@ def triage(dd: DemoData, t: pd.Timestamp, threshold: float) -> pd.DataFrame:
     for i in range(len(P)):
         p, f = P.iloc[i], Fe.iloc[i]
         g = reroute_missing(G.iloc[i].copy(), f)
-        g = g.drop(labels=["data_quality"], errors="ignore")
+        # time of day is shared by every patient at one clinic time, so it cannot say why this patient ranks high
+        g = g.drop(labels=["data_quality", "time_of_day"], errors="ignore")
         top = g.idxmax() if g.max() > 1 else None
-        reason = f"{GROUPS[top][0]}: {sentence(top, True, f)}" if top else "no strong driver"
+        reason = sentence(top, True, f) if top else "no strong driver"
         colour, label = status(p, threshold)
         # severity: predicted lows first, then the highest predicted 2-hour peak
         rank = 0 if label == "Low glucose risk" else 1
