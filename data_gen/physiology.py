@@ -352,10 +352,11 @@ def meal_appearance(meals: pd.DataFrame, latent: pd.DataFrame, cfg: dict, n_min:
             kern = w * kf * kf * tau * np.exp(-kf * tau) + (1 - w) * ks * ks * tau * np.exp(-ks * tau)
             kern /= kern.sum()
             start = int(m.minute)
-            if start >= n_min or carbs <= 0:
+            if start >= n_min or start + k_len <= 0 or carbs <= 0:
                 continue
-            end = min(start + k_len, n_min)
-            ra[i, start:end] += gut["bioavailability"] * carbs * 1000.0 / vg * kern[: end - start]
+            skip = max(0, -start)            # a meal eaten before minute 0 contributes its remaining tail
+            a, end = max(start, 0), min(start + k_len, n_min)
+            ra[i, a:end] += gut["bioavailability"] * carbs * 1000.0 / vg * kern[skip : skip + end - a]
     return ra
 
 

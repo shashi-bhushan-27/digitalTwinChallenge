@@ -1,8 +1,8 @@
 {
   "n_patients": 60,
   "recovery": {
-    "si_prior_vs_true": 0.6100004173296638,
-    "si_fit_vs_true": 0.34075247357277444,
+    "si_prior_vs_true": 0.6098723239310974,
+    "si_fit_vs_true": 0.3407057515976661,
     "beta_prior_vs_true": 0.5792720200055572,
     "beta_fit_vs_true": 0.5313698249513755,
     "si_fit_x_beta_fit_vs_true_product": 0.5975548763545431,
@@ -17,61 +17,61 @@
     "20-min walk after the meal": {
       "n": 50,
       "true_delta_median": -4.575462341308594,
-      "mae_fitted": 2.8317523193359375,
-      "mae_prior": 2.726287841796875,
-      "bias_fitted": 0.83059326171875,
-      "base_peak_bias_fitted": -32.11259338378907,
+      "mae_fitted": 3.2559979248046873,
+      "mae_prior": 3.32841064453125,
+      "bias_fitted": -0.8822796630859375,
+      "base_peak_bias_fitted": -8.67743896484375,
       "mae_cohort_average": 2.7451310262874684,
-      "spearman_fitted": 0.23740605664123074,
-      "spearman_prior": 0.2990912136363782,
-      "sign_agreement_fitted": 0.86
+      "spearman_fitted": 0.1473583135673204,
+      "spearman_prior": 0.1917578474670325,
+      "sign_agreement_fitted": 0.94
     },
     "half portion": {
       "n": 50,
       "true_delta_median": -44.613426208496094,
-      "mae_fitted": 13.79297119140625,
-      "mae_prior": 13.974352111816406,
-      "bias_fitted": 9.477415161132813,
-      "base_peak_bias_fitted": -32.11259338378907,
+      "mae_fitted": 13.318348693847657,
+      "mae_prior": 13.048627624511719,
+      "bias_fitted": 9.838919982910156,
+      "base_peak_bias_fitted": -8.67743896484375,
       "mae_cohort_average": 15.541466761997768,
-      "spearman_fitted": 0.6396106021345521,
-      "spearman_prior": 0.60472625047973,
-      "sign_agreement_fitted": 0.86
+      "spearman_fitted": 0.6777617870757688,
+      "spearman_prior": 0.6666348627105785,
+      "sign_agreement_fitted": 0.94
     },
     "skip the meal": {
       "n": 50,
       "true_delta_median": -83.97502136230469,
-      "mae_fitted": 31.533863677978516,
-      "mae_prior": 33.49986068725586,
-      "bias_fitted": 22.887737274169922,
-      "base_peak_bias_fitted": -32.11259338378907,
+      "mae_fitted": 27.140172119140626,
+      "mae_prior": 25.849478912353515,
+      "bias_fitted": 16.42870635986328,
+      "base_peak_bias_fitted": -8.67743896484375,
       "mae_cohort_average": 34.66564952616788,
-      "spearman_fitted": 0.7612968439759935,
-      "spearman_prior": 0.7583617468022775,
-      "sign_agreement_fitted": 0.86
+      "spearman_fitted": 0.7666186580338986,
+      "spearman_prior": 0.7772200273776566,
+      "sign_agreement_fitted": 0.94
     },
     "swap to a low-GI plate": {
       "n": 50,
       "true_delta_median": -34.138671875,
-      "mae_fitted": 14.661356811523438,
-      "mae_prior": 18.205948791503907,
-      "bias_fitted": 1.168194580078125,
-      "base_peak_bias_fitted": -32.11259338378907,
+      "mae_fitted": 13.140656127929688,
+      "mae_prior": 16.246998596191407,
+      "bias_fitted": 1.2150018310546875,
+      "base_peak_bias_fitted": -8.67743896484375,
       "mae_cohort_average": 31.000228246572068,
-      "spearman_fitted": 0.8914245563921885,
-      "spearman_prior": 0.891162369598456,
-      "sign_agreement_fitted": 0.78
+      "spearman_fitted": 0.9127887474269415,
+      "spearman_prior": 0.9046246980207975,
+      "sign_agreement_fitted": 0.84
     }
   },
   "hypo": {
     "n_su_users": 24,
     "true_lows": 4,
-    "twin_flags": 2,
-    "flagged_true_lows": 2,
-    "missed_true_lows": 2,
+    "twin_flags": 1,
+    "flagged_true_lows": 1,
+    "missed_true_lows": 3,
     "false_flags": 0,
     "true_lows_with_caution_or_flag": 4,
-    "trough_spearman": 0.788695652173913,
-    "trough_mae": 12.24189027150472
+    "trough_spearman": 0.766086956521739,
+    "trough_mae": 11.699761390686035
   }
 }

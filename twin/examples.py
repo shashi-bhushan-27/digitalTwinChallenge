@@ -26,6 +26,11 @@ from twin.validate import load_tables
 RES = config.REPO_ROOT / "results" / "twin"
 
 
+def _ordinal(x: float) -> str:
+    n = int(round(x))
+    return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
+
+
 def _plot(ax, outcomes: list[tuple[str, W.Outcome, str]], title: str, t_now: pd.Timestamp) -> None:
     ax.axhspan(70, 180, color="#e9f3ea", zorder=0)
     ax.axhline(180, color="#c0392b", lw=0.7, ls="--")
@@ -81,7 +86,7 @@ def main() -> None:
         day = pd.Timestamp(obs.cgm["timestamp"].min()).normalize() + pd.Timedelta(days=9)
         lines += [f"## {story.title()}: {pid} ({int(p['age_yr'])} y {p['sex']}, HbA1c {p['hba1c_pct']} %, eGFR {int(p['egfr'])}, {p['diet_type'].replace('_', '-')})",
                   "", "Patient factors considered: " + ", ".join(W.patient_factors(p, obs.meds)), "",
-                  "Twin state: " + "; ".join(f"{r['label']} {r['band']} ({r['percentile']:.0f}th percentile, confidence {r['confidence']})"
+                  "Twin state: " + "; ".join(f"{r['label']} {r['band']} ({_ordinal(r['percentile'])} percentile, confidence {r['confidence']})"
                                              if r["percentile"] is not None else f"{r['label']} (no reference yet)" for r in card["rows"])
                   + f"; a standard 60 g meal raises glucose by about {card['standard_meal']['rise']:.0f} mg/dL, peaking after "
                   f"{card['standard_meal']['time_to_peak_min']} min. {card['fit_note']}.", ""]

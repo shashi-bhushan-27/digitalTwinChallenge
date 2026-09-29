@@ -33,14 +33,14 @@ For one logged dinner per patient on held-out days, the twin predicts how the 5-
 
 | intervention | patients | median true change (mg/dL) | MAE personalised twin | MAE record-only twin | MAE cohort average | Spearman (personalised) | sign agreement |
 |---|---|---|---|---|---|---|---|
-| 20-min walk after the meal | 50 | -4.6 | 2.8 | 2.7 | 2.7 | 0.24 | 86 % |
-| half portion | 50 | -44.6 | 13.8 | 14.0 | 15.5 | 0.64 | 86 % |
-| skip the meal | 50 | -84.0 | 31.5 | 33.5 | 34.7 | 0.76 | 86 % |
-| swap to a low-GI plate | 50 | -34.1 | 14.7 | 18.2 | 31.0 | 0.89 | 78 % |
+| 20-min walk after the meal | 50 | -4.6 | 3.3 | 3.3 | 2.7 | 0.15 | 94 % |
+| half portion | 50 | -44.6 | 13.3 | 13.0 | 15.5 | 0.68 | 94 % |
+| skip the meal | 50 | -84.0 | 27.1 | 25.8 | 34.7 | 0.77 | 94 % |
+| swap to a low-GI plate | 50 | -34.1 | 13.1 | 16.2 | 31.0 | 0.91 | 84 % |
 
-The personalised twin beats both the record-only twin and the cohort average for: half portion, skip the meal, swap to a low-GI plate.
+The personalised twin beats both the record-only twin and the cohort average for: swap to a low-GI plate.
 
-Systematic error of the personalised twin (predicted minus true change; negative true changes mean a lower peak): 20-min walk after the meal: +0.8 mg/dL; half portion: +9.5 mg/dL; skip the meal: +22.9 mg/dL; swap to a low-GI plate: +1.2 mg/dL. Its predicted dinner peak before any change is off by -32.1 mg/dL on average, so large meal effects are under-estimated: the twin sees smaller meals than were eaten (logged portions and unlogged extras).
+Systematic error of the personalised twin (predicted minus true change; negative true changes mean a lower peak): 20-min walk after the meal: -0.9 mg/dL; half portion: +9.8 mg/dL; skip the meal: +16.4 mg/dL; swap to a low-GI plate: +1.2 mg/dL. Its predicted dinner peak before any change is off by -8.7 mg/dL on average, so large meal effects are under-estimated: the twin sees smaller meals than were eaten (logged portions and unlogged extras).
 
 ## 4. Hypoglycaemia check
 
@@ -52,10 +52,10 @@ Scenario for every sulfonylurea user among the test patients: sulfonylurea raise
 |---|---|
 | sulfonylurea users | 24 |
 | true lows (< 70 mg/dL) | 4 |
-| lows flagged by the twin | 2 of 4 |
+| lows flagged by the twin | 1 of 4 |
 | true lows at least flagged as 'caution' (< 80) | 4 of 4 |
 | false low flags | 0 |
-| trough error (MAE) | 12.2 mg/dL; Spearman 0.79 |
+| trough error (MAE) | 11.7 mg/dL; Spearman 0.77 |
 
 ## 5. Worked examples
 See [`twin_examples.md`](twin_examples.md): meal options with blocked choices and reasons, a post-dinner walk, a sulfonylurea hypoglycaemia warning, and a kidney-limited drug change on a typical day at steady state.

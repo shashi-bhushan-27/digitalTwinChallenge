@@ -187,8 +187,11 @@ def simulate_plan(twin: TwinState, obs: Observed, state: dict, t_now: pd.Timesta
         a, b = max(w.offset_min, 0), min(w.offset_min + w.duration_min, n_min)
         extra[a:b] = w.cadence_spm
     doses = _dose_plan(obs.meds, plan.dose_changes, t_now, n_min, scale=1.0)
-    inp = build_inputs(twin.latent, _plate_meals(plan, t_now, library_by_id), future, win, pcfg, carb_scale=twin.carb_scale,
-                       extra_steps=extra, dose_plan=doses)
+    # meals already eaten are still being absorbed: carry their remaining tail into the forecast
+    k_len = pd.Timedelta(hours=pcfg["gut"]["kernel_hours"])
+    eaten = twin.meals[(twin.meals["timestamp"] <= t_now) & (twin.meals["timestamp"] > t_now - k_len)]
+    meals = pd.concat([eaten, _plate_meals(plan, t_now, library_by_id)], ignore_index=True)
+    inp = build_inputs(twin.latent, meals, future, win, pcfg, carb_scale=twin.carb_scale, extra_steps=extra, dose_plan=doses)
     g = ph.simulate(twin.latent, inp, twin_physiology_config(pcfg), init=state, record_every=n_min).glucose[0]
     return _outcome(g, t_now, tcfg)
 

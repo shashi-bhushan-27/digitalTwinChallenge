@@ -9,7 +9,7 @@
 | Team | AMRIT_VIT (one member): **Shashi Bhushan**, team leader, shashibhushanvijay@gmail.com |
 | College | Vellore Institute of Technology (VIT), Vellore |
 | Condition | Type 2 diabetes (India) |
-| Status | Phases 1-3 complete (synthetic data + validation, prediction models + explanations, personalised what-if twin); Phase 4 (dashboard) next |
+| Status | Phases 1-4 complete (synthetic data + validation, prediction models + explanations, personalised what-if twin, dashboard); Phase 5 (submission package) next |
 | Video | _link to be added (20+ minute recording)_ |
 | Architecture diagram | _docs/architecture.pdf (Phase 5)_ |
 | Presentation | _docs/presentation.pdf (Phase 5)_ |
@@ -62,6 +62,14 @@ The dataset (400 patients x 14 days) regenerates identically from one seed and i
 - **Constraints** (`twin/constraints.py`): diet type, allergies, intolerances and eGFR drug limits are checked before anything is simulated, and blocked options show their reason.
 - **Safety:** every result carries a hypoglycaemia check (below 70 mg/dL) and the patient's risk factors. It is labelled "Simulation for discussion with the patient, not a prescription."
 - **Twin card** (`twin/card.py`): insulin sensitivity and secretion versus similar patients, with uncertainty, plus the patient's response to a standard meal.
+
+### Doctor-facing dashboard (Phase 4, done)
+`uv run streamlit run dashboard/app.py` (after `uv run python -m dashboard.prepare`). Four tabs:
+- **Patient:** synthetic patient header with a red/amber/green alert chip, and one plain-language sentence, for example "Spike likely (90 %): above 180 in about 50 min, peak about 214 mg/dL (80 % range 193-263)". The main chart shows the last 24 h of CGM plus the 2-hour forecast with its band, and steps, heart rate, sleep stages and HRV sit on the same time axis. It also has "why this prediction" in clinical sentences, the record with allergy badges, and the twin state.
+- **What-if:** meal swaps from the Indian dish library, portion changes, a walk, skipping a meal, or a medicine change, all simulated on the patient's personalised twin. Blocked options are listed with their reasons, and every result carries a hypoglycaemia check.
+- **Triage:** every patient at the chosen clinic time, predicted lows first, then the highest predicted 2-hour peak, each with a one-line reason.
+- **About this twin:** evaluation, real-data validation, what-if validation, limitations and data provenance.
+- **Throughout:** an alert-sensitivity slider (showing the test-set catch rate and false alerts per day), a replay control that steps the twin forward, and "show what actually happened" for the demo. Three scripted demo scenes (a correct alert, a stable patient, and a moment where the model says it is unsure) are picked automatically from held-out days.
 
 ### Validation against real open data (Phase 1, done)
 Real data is used **only** to calibrate seven population-level settings and to validate. It is never used to train the product models.
@@ -142,20 +150,30 @@ One check went the "wrong" way, and it teaches something. After a post-meal walk
 
 | intervention | median true change | personalised twin | record-only twin | cohort average |
 |---|---|---|---|---|
-| swap to a low-GI plate | −34 mg/dL | 14.7 | 18.2 | 31.0 |
-| half portion | −45 mg/dL | 13.8 | 14.0 | 15.5 |
-| skip the meal | −84 mg/dL | 31.5 | 33.5 | 34.7 |
-| 20-min walk after the meal | −5 mg/dL | 2.8 | 2.7 | 2.7 |
+| swap to a low-GI plate | −34 mg/dL | **13.1** | 16.2 | 31.0 |
+| half portion | −45 mg/dL | 13.3 | **13.0** | 15.5 |
+| skip the meal | −84 mg/dL | 27.1 | **25.8** | 34.7 |
+| 20-min walk after the meal | −5 mg/dL | 3.3 | 3.3 | **2.7** |
 
-The twin ranks patients well for the swap (Spearman 0.89). It under-estimates what cutting or skipping a meal would do, because it sees smaller meals than were eaten. Its predicted dinner peak is 32 mg/dL too low on average. Held-out CGM error is 35 mg/dL for the personalised twin, against 40 for the record-only twin.
+**How good is it?**
+- Both twins beat the cohort average for every meal change.
+- The predicted change has the right direction for 94 % of patients (84 % for the swap).
+- Personalisation clearly helps for the dish swap (Spearman 0.91).
+- For resizing or skipping a meal, the record-based twin is just as good.
+- Both under-estimate large cuts, because they see somewhat smaller meals than were eaten. The predicted dinner peak is 9 mg/dL too low on average.
+- The effect of a walk is too small to predict usefully.
 
-**Safety.** For 24 sulfonylurea users, the test scenario was "maximum dose, breakfast skipped". The twin flagged 2 of the 4 true lows and marked the other 2 as "caution" (below 80 mg/dL), with no false alarms.
+**Safety.** For 24 sulfonylurea users, the test scenario was "maximum dose, breakfast skipped". All 4 true lows were at least flagged "caution" (below 80 mg/dL), 1 of them as a predicted low, with no false alarms.
 
 **Constraints first.** Options that conflict with diet, allergies, intolerances or kidney limits are never simulated, and they show the reason. For example: "Metformin 1000 → 2000 mg/day: BLOCKED, eGFR 40 (30-44): metformin limited to 1000 mg/day".
 
 ![worked examples](results/twin/worked_examples.png)
 
-**What didn't work.** Fitting the physiology parameters from a week of CGM and an incomplete meal log does not recover them better than the record-based estimate. The fit still improves prediction, so the twin card shows these values with their uncertainty. Details are in [`docs/twin_report.md`](docs/twin_report.md) and [`docs/twin_examples.md`](docs/twin_examples.md).
+**What didn't work, and a bug found on the way.**
+- **Parameter recovery.** Fitting the physiology parameters from a week of CGM and an incomplete meal log does not recover them better than the record-based estimate. The fit improves held-out prediction (CGM error 35 vs 40 mg/dL), so the twin card shows the values with their uncertainty.
+- **Meal-absorption bug.** Building the dashboard exposed a bug: forward simulations dropped the absorption of meals already eaten. The fix cut the twin's peak bias from −32 to −9 mg/dL, and the validation above was re-run after it.
+
+Details are in [`docs/twin_report.md`](docs/twin_report.md) and [`docs/twin_examples.md`](docs/twin_examples.md).
 
 ## Repository layout
 
@@ -193,6 +211,8 @@ uv run python -m models.report                   # docs/model_report.md
 uv run python -m twin.validate                   # Phase 3: personalise + validate the twin on test patients (about 1 hour)
 uv run python -m twin.report                     # docs/twin_report.md
 uv run python -m twin.examples                   # worked what-if examples and plots
+uv run python -m dashboard.prepare               # Phase 4: build the dashboard's demo cache (about 2 minutes)
+uv run streamlit run dashboard/app.py            # open the dashboard at http://localhost:8501
 ```
 
 ## Responsible-data notes (DPDP-aware design)

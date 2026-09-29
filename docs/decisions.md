@@ -97,3 +97,15 @@ Meals, walks and one-off dose changes: simulate the next 5 hours from the twin's
 
 ## D-029 Constraints block before simulating
 Blocked options (diet, allergy, intolerance, eGFR limits, maximum doses) are never simulated and always carry their reason; warnings (age, eGFR and sulfonylurea hypoglycaemia risk, sulfonamide allergy, neuropathy before walks, large insulin steps) are simulated and shown with the result. All rules are listed in `docs/clinical_rules_to_review.md`.
+
+## D-030 Dashboard design
+Streamlit + Plotly (`dashboard/`), with every model call behind `dashboard/service.py`, which the UI calls; the UI never touches model internals. Four tabs: Patient (header chips with a red/amber/green alert chip; one plain-language sentence; 24 h CGM + 2 h forecast with the 80 % band, target range, threshold and meal markers; steps, heart rate, sleep stages and HRV on the same time axis; "why this prediction" as clinical sentences in mg/dL; record card with allergy badges and HbA1c trend; twin state card), What-if (personalised twin, constraint verdicts before simulating, hypoglycaemia check, "patient factors considered"), Triage, About this twin. The banner "Synthetic patient. Decision support only." is always shown. Colours: one accent blue; red/amber/green only for risk.
+
+## D-031 Alert chip and triage ranking
+Chip: red for a predicted low (80 % band below 70) or a spike alert at the chosen threshold; amber for "high now" (above 180) or a probability of 0.3 or more; green otherwise. Triage ranks predicted lows first, then the highest predicted 2-hour peak (in a cohort with median HbA1c above 8 %, colour alone put nearly everyone in red at lunchtime).
+
+## D-032 What-if carries meals already eaten
+The ODE's meal absorption is an input, not a state, so forward simulations add the remaining absorption of meals eaten in the previous 8 hours (found while testing the dashboard; the twin validation was re-run after the fix). When a meal was just logged, the what-if defaults to "walk now" rather than changing a later meal.
+
+## D-033 Demo cache and scripted scenes
+`uv run python -m dashboard.prepare` builds `data/demo/` (test patients' observed data and features, model outputs every 5 minutes, a 20k-row reference pool for explanations, fitted twins) and picks the three demo scenes automatically from held-out days by rule: a correct alert after a logged meal, a stable well-controlled patient, and an uncertain moment (probability 40-60 %, wide band, missing inputs). The cache (about 60 MB) and trained models are not committed; they rebuild from the pipeline.

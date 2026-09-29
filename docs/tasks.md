@@ -38,5 +38,12 @@ Status: `[x]` done, `[~]` in progress, `[ ]` to do. Updated at the end of each w
 - [x] Exact truth replay for ground-truth counterfactuals; validation on test patients (recovery, fidelity, counterfactuals, hypo check)
 - [x] Twin state card; worked examples with plots; `docs/clinical_rules_to_review.md` section D
 - [ ] Clinical review of constraint rules (D1-D9)
-## Phase 4: Dashboard (next)
+## Phase 4: Dashboard
+- [x] Service layer (`dashboard/service.py`) and demo cache builder with auto-picked scenes (`dashboard/prepare.py`)
+- [x] Patient view: header + alert chip, plain-language forecast, hero chart with 80 % band, wearable strip, why panel, record card, twin card
+- [x] What-if tab: meal swap/portion/skip, walk, medicine (next hours or typical day), blocked options with reasons, hypo check
+- [x] Triage ranked by severity; sensitivity slider with test-set operating point; replay (play + "what actually happened")
+- [x] About this twin: evaluation, real-data validation, what-if validation, limitations and provenance
+- [x] Headless tests (AppTest): all scenes, what-if run, time controls, no raw feature names on screen
+- [ ] Screenshots for the README and slides (Phase 5)
 ## Phase 5: Submission package

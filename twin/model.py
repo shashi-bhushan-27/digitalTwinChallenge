@@ -144,7 +144,8 @@ def build_inputs(lat: pd.DataFrame, meals: pd.DataFrame, obs: Observed, win: Win
     n = len(lat)
     m = meals.copy()
     m["minute"] = win.minute(m["timestamp"]) if len(m) else []
-    m = m[(m["minute"] >= 0) & (m["minute"] < win.n_min)]
+    k_len = int(pcfg["gut"]["kernel_hours"] * 60)
+    m = m[(m["minute"] > -k_len) & (m["minute"] < win.n_min)]    # earlier meals still being absorbed are kept
     m["patient_id"] = lat["patient_id"].iat[0]
     base = ph.meal_appearance(m, lat.iloc[:1], q, win.n_min, seed=0)[0]
     scale = np.broadcast_to(np.asarray(carb_scale, float), (n,)).copy()

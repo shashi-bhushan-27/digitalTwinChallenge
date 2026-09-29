@@ -8,11 +8,11 @@ Patient factors considered: HbA1c 10.1 %, eGFR 117, BMI 24.4, vegetarian, peanut
 
 Twin state: Insulin sensitivity high (100th percentile, confidence good); Insulin secretion (beta-cell) low (15th percentile, confidence good); a standard 60 g meal raises glucose by about 65 mg/dL, peaking after 73 min. Estimated from 7 days of CGM, 28 logged meals (15 unlogged rises filled in); CGM fit error 25 mg/dL.
 
-Plan: Rice, sambar, poriyal and curd at 20:30; predicted 5-h peak 290 mg/dL.
-- **Swap the meal for Roti (2), paneer bhurji and salad** (allowed): peak 269 mg/dL (-21); minutes above 180: 300 -> 300. 
-- **Change the portion to 0.5x** (allowed): peak 269 mg/dL (-21); minutes above 180: 300 -> 300. 
+Plan: Rice, sambar, poriyal and curd at 20:30; predicted 5-h peak 348 mg/dL.
+- **Swap the meal for Roti (2), paneer bhurji and salad** (allowed): peak 284 mg/dL (-64); minutes above 180: 300 -> 300. 
+- **Change the portion to 0.5x** (allowed): peak 310 mg/dL (-38); minutes above 180: 300 -> 300. 
 - **Swap the meal for Egg bhurji with roti (2)**: BLOCKED - not vegetarian (contains egg); patient is vegetarian (not simulated)
-- Safety: No predicted low (trough 201 mg/dL).
+- Safety: No predicted low (trough 208 mg/dL).
 
 ## Walk: SP-0011 (62 y M, HbA1c 8.3 %, eGFR 71, non-vegetarian)
 
@@ -20,26 +20,26 @@ Patient factors considered: HbA1c 8.3 %, eGFR 71, BMI 27.6, non-vegetarian, peni
 
 Twin state: Insulin sensitivity below average (27th percentile, confidence good); Insulin secretion (beta-cell) average (48th percentile, confidence good); a standard 60 g meal raises glucose by about 99 mg/dL, peaking after 95 min. Estimated from 7 days of CGM, 30 logged meals (20 unlogged rises filled in); CGM fit error 20 mg/dL.
 
-Plan: Rice, sambar, poriyal and curd at 20:30; predicted 5-h peak 315 mg/dL.
-- **Walk 15 min, starting 20 min after the meal** (allowed): peak 309 mg/dL (-6); minutes above 180: 300 -> 300. 
-- **Walk 30 min, starting 20 min after the meal** (allowed): peak 301 mg/dL (-13); minutes above 180: 300 -> 300. 
+Plan: Rice, sambar, poriyal and curd at 20:30; predicted 5-h peak 325 mg/dL.
+- **Walk 15 min, starting 20 min after the meal** (allowed): peak 318 mg/dL (-7); minutes above 180: 300 -> 300. 
+- **Walk 30 min, starting 20 min after the meal** (allowed): peak 309 mg/dL (-15); minutes above 180: 300 -> 300. 
 - Safety: No predicted low (trough 203 mg/dL).
 
-## Hypo: SP-0043 (34 y F, HbA1c 8.4 %, eGFR 105, non-vegetarian)
+## Hypo: SP-0218 (62 y F, HbA1c 9.0 %, eGFR 40, non-vegetarian)
 
-Patient factors considered: HbA1c 8.4 %, eGFR 105, BMI 32.3, non-vegetarian, fatty liver, glimepiride, metformin
+Patient factors considered: HbA1c 9.0 %, eGFR 40, BMI 27.6, non-vegetarian, glimepiride, metformin, sitagliptin
 
-Twin state: Insulin sensitivity average (50th percentile, confidence good); Insulin secretion (beta-cell) high (80th percentile, confidence good); a standard 60 g meal raises glucose by about 80 mg/dL, peaking after 82 min. Estimated from 7 days of CGM, 42 logged meals (12 unlogged rises filled in); CGM fit error 19 mg/dL.
+Twin state: Insulin sensitivity above average (63rd percentile, confidence good); Insulin secretion (beta-cell) above average (58th percentile, confidence good); a standard 60 g meal raises glucose by about 80 mg/dL, peaking after 78 min. Estimated from 7 days of CGM, 38 logged meals (16 unlogged rises filled in); CGM fit error 21 mg/dL.
 
-Scenario: glimepiride raised to 8 mg and breakfast skipped (8 h from 07:30). Constraint check: allowed - no issue.
-- Usual morning: low 107 mg/dL; scenario: low 72 mg/dL, 0 min below 70.
-- Safety: **Trough 72 mg/dL is close to the 70 mg/dL hypoglycaemia threshold**; risk factors: sulfonylurea.
+Scenario: glimepiride raised to 8 mg and breakfast skipped (8 h from 07:30). Constraint check: warn - eGFR 40: sulfonylurea clearance is reduced, hypoglycaemia risk rises.
+- Usual morning: low 131 mg/dL; scenario: low 67 mg/dL, 48 min below 70.
+- Safety: **Predicted low: trough 67 mg/dL (below 70)**; risk factors: eGFR 40, sulfonylurea.
 
 ## Kidney: SP-0218 (62 y F, HbA1c 9.0 %, eGFR 40, non-vegetarian)
 
 Patient factors considered: HbA1c 9.0 %, eGFR 40, BMI 27.6, non-vegetarian, glimepiride, metformin, sitagliptin
 
-Twin state: Insulin sensitivity above average (63th percentile, confidence good); Insulin secretion (beta-cell) above average (58th percentile, confidence good); a standard 60 g meal raises glucose by about 80 mg/dL, peaking after 78 min. Estimated from 7 days of CGM, 38 logged meals (16 unlogged rises filled in); CGM fit error 21 mg/dL.
+Twin state: Insulin sensitivity above average (63rd percentile, confidence good); Insulin secretion (beta-cell) above average (58th percentile, confidence good); a standard 60 g meal raises glucose by about 80 mg/dL, peaking after 78 min. Estimated from 7 days of CGM, 38 logged meals (16 unlogged rises filled in); CGM fit error 21 mg/dL.
 
 - **Metformin 1000 -> 2000 mg/day**: BLOCKED - eGFR 40 (30-44): metformin limited to 1000 mg/day (not simulated)
 - **Add dapagliflozin** (warn: eGFR 40 is below 45: little glucose-lowering effect expected): typical-day mean glucose 176 -> 173 mg/dL, time in range 69 % -> 71 %, roughly -0.1 HbA1c points at steady state (ADAG, rough).

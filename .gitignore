@@ -30,3 +30,7 @@ BUILD_PROMPT.md
 data/features/
 models/artifacts/
 results/models/test_predictions.parquet
+
+# Dashboard demo cache (rebuilt with `uv run python -m dashboard.prepare`)
+data/demo/*
+!data/demo/.gitkeep
