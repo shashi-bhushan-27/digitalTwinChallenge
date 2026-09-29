@@ -34,11 +34,21 @@ Rules the simulator and (later) the what-if simulator rely on. They were written
 | B11 | Short sleep (below 7 h) lowers next-day insulin sensitivity by ~8 % per missing hour; stress and illness lower it further and raise hepatic output | |
 | B12 | Fatty liver makes hepatic glucose output harder for insulin to suppress | |
 
-## C. Hypoglycaemia flag (to be used by the what-if simulator, Phase 3)
+## C. Hypoglycaemia flag (what-if simulator, `twin/whatif.py`)
 | # | Rule | Review |
 |---|---|---|
-| C1 | Flag any simulated trough below 70 mg/dL | |
-| C2 | Risk is higher with lower eGFR, older age and sulfonylurea use (these act through B3, B4 and B7 above, not as separate multipliers) | |
+| C1 | Flag any simulated trough below 70 mg/dL as "predicted low"; below 80 mg/dL as "caution" | |
+| C2 | Show risk factors with every result: age 65 or older, eGFR below 45, sulfonylurea or basal insulin use (they act through B3, B4 and B7, not as separate multipliers) | |
 
-## D. What-if constraints (to be completed in Phase 3)
-Allergies and intolerances block meals containing the allergen; diet type (vegetarian, Jain) filters the meal library; eGFR limits block metformin and SGLT2 changes as in A1, A2 and A7.
+## D. What-if constraints (`configs/twin.yaml`, `twin/constraints.py`)
+| # | Rule as implemented | Review |
+|---|---|---|
+| D1 | Meal swaps blocked if the dish conflicts with diet type (vegetarian: no meat, fish or egg; Jain: also no onion, garlic or root vegetables) | |
+| D2 | Meal swaps blocked if the dish contains a recorded food allergen (peanut, tree nut, milk, egg, fish, shellfish) or intolerance (lactose, gluten) | |
+| D3 | Metformin: blocked if eGFR < 30; limited to 1000 mg/day if eGFR 30-44; maximum 2000 mg/day in this twin; warning if metformin GI intolerance | |
+| D4 | SGLT2 inhibitors: do not start if eGFR < 25; warning "little glucose-lowering effect" if eGFR < 45 | |
+| D5 | Sulfonylureas: maximum glimepiride 8 mg/day, gliclazide MR 120 mg/day; warning if age >= 65 or eGFR < 60 (hypoglycaemia); warning if sulfonamide-antibiotic allergy | |
+| D6 | Sitagliptin: maximum 50 mg/day if eGFR 30-44, 25 mg/day if eGFR < 30 | |
+| D7 | Basal insulin: warning if one change exceeds 20 % of the current dose | |
+| D8 | Walks: warning to check feet and footwear if peripheral neuropathy is recorded | |
+| D9 | Stopping a glucose-lowering drug: warning only (simulated, flagged for review) | |

@@ -41,6 +41,7 @@ lgb:
 alerts:
   refractory_min: 60       # a new alert episode starts only after 60 min without alerts
   sensitivity_grid: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7]   # probability thresholds for the dashboard slider
+  default_threshold: 0.5   # dashboard default (team decision D-025); the max-F1 point from validation is kept in meta.json
 
 explain:
   background_size: 100     # shap's interventional masker uses at most 100 rows by default

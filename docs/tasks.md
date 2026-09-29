@@ -31,10 +31,12 @@ Status: `[x]` done, `[~]` in progress, `[ ]` to do. Updated at the end of each w
 - [x] `docs/model_report.md`, `docs/example_explanations.md`, inference API for the dashboard
 - [ ] Clinician read of `docs/example_explanations.md`
 
-## Phase 3: Twin core and what-if (next)
-- [ ] Twin state estimation: fit a patient's hidden parameters from observed CGM + meal log + EHR (validate against truth)
-- [ ] `twin/` simulate(profile, state, intervention) API on the ODE core; Indian meal library for swaps
-- [ ] Constraint checks (allergies, diet, eGFR drug limits) with reasons; hypoglycaemia flag (< 70 mg/dL)
-- [ ] Worked examples with plots; `docs/clinical_rules_to_review.md` updated
-## Phase 4: Dashboard
+## Phase 3: Twin core and what-if
+- [x] Twin state estimation from observed CGM + meal log + EHR (record prior + grid fit; D-027)
+- [x] `twin/` what-if API on the ODE core (next hours and typical day); Indian meal library for swaps
+- [x] Constraint checks (diet, allergies, intolerances, eGFR drug limits, max doses) with reasons; hypoglycaemia flag and risk factors
+- [x] Exact truth replay for ground-truth counterfactuals; validation on test patients (recovery, fidelity, counterfactuals, hypo check)
+- [x] Twin state card; worked examples with plots; `docs/clinical_rules_to_review.md` section D
+- [ ] Clinical review of constraint rules (D1-D9)
+## Phase 4: Dashboard (next)
 ## Phase 5: Submission package

@@ -90,6 +90,8 @@ Operating point chosen on validation patients (maximum F1): probability >= **0.3
 
 Calibration on test patients: expected calibration error 0.039; largest gap in the bin around 0.63 predicted vs 0.74 observed (probabilities slightly too low on average; isotonic calibration was fitted on the validation patients).
 
+**Dashboard default: 0.50** (team decision D-025, to reduce alert fatigue): 92.2 % of spikes caught, median lead time 80 min, 0.69 false alert episodes per patient-day, 68 % of alert episodes followed by a spike.
+
 Sensitivity slider (what the dashboard offers; a higher threshold means fewer, more certain alerts):
 
 | threshold | precision | recall | event_recall | median_lead_time_min | episode_precision | false_alerts_per_patient_day |

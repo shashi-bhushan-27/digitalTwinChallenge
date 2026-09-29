@@ -411,6 +411,7 @@ class SimInputs:
     egp_mult: np.ndarray                 # (N, T) hidden daily EGP multiplier
     doses: dict[int, list[tuple[int, str, float]]] = field(default_factory=dict)  # minute -> (row, compartment, amount)
     start_minute_of_day: int = 0
+    ra_scale: np.ndarray | None = None   # optional per-row multiplier on Ra (twin candidates share one meal input)
 
     @property
     def n_min(self) -> int:
@@ -476,7 +477,7 @@ def simulate(latent: pd.DataFrame, inputs: SimInputs, cfg: dict, init: dict | No
             st[comp][row] += amt
         G, I, Y, Ih, X = st["G"], st["I"], st["Y"], st["Ih"], st["X"]
         eff = drug_effects(st, p, cfg)
-        ra = inputs.ra[:, t]
+        ra = inputs.ra[:, t] if inputs.ra_scale is None else inputs.ra[:, t] * inputs.ra_scale
         e = inputs.exercise[:, t]
         inc = inc_gain * (1 + dpp4_boost * eff["dpp4"]) * ra / (ra + inc_half)
 

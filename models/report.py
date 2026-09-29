@@ -38,6 +38,17 @@ def _boot_table() -> str:
     return "\n".join(rows)
 
 
+def _default_note(sens: pd.DataFrame) -> str:
+    thr = config.load("models")["alerts"].get("default_threshold")
+    row = sens[(sens["threshold"] - thr).abs() < 1e-9] if thr is not None else sens.iloc[:0]
+    if row.empty:
+        return ""
+    r = row.iloc[0]
+    return (f"**Dashboard default: {thr:.2f}** (team decision D-025, to reduce alert fatigue): {100 * r['event_recall']:.1f} % of spikes caught, "
+            f"median lead time {r['median_lead_time_min']:.0f} min, {r['false_alerts_per_patient_day']:.2f} false alert episodes per patient-day, "
+            f"{100 * r['episode_precision']:.0f} % of alert episodes followed by a spike.")
+
+
 def _calibration_note() -> str:
     c = pd.read_csv(RES / "models" / "fusion_calibration.csv")
     gap = c["observed_rate"] - c["mean_predicted"]
@@ -154,6 +165,8 @@ def main() -> None:
         "![calibration](../results/models/calibration.png) ![alerts](../results/models/alert_tradeoff.png)",
         "",
         _calibration_note(),
+        "",
+        _default_note(sens),
         "",
         "Sensitivity slider (what the dashboard offers; a higher threshold means fewer, more certain alerts):",
         "",

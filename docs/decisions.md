@@ -82,3 +82,18 @@ SHAP explains the peak model in mg/dL against a reference cohort of similar trai
 
 ## D-024 Explanation checks use contrasts, not correlations
 Raw correlations between SHAP and hidden truth were confounded by time of day (steps mostly mean "daytime, meals coming"). The checks compare like with like (same post-meal window with and without a walk; short vs long hidden sleep; lowest vs highest third of hidden insulin sensitivity at similar glucose). Two contrasts go against the naive expectation and are reported with their explanation: the post-walk rebound (the model is right, the expectation was naive) and insulin resistance (the model hardly uses the record; effect below 1 mg/dL).
+
+## D-025 Dashboard alert threshold 0.5
+Team decision (30 Sep 2026): the dashboard defaults to a calibrated spike probability of 0.5 instead of the validation max-F1 point (0.36). On test patients this catches 92.2 % of spikes (vs 95.9 %) with 0.69 instead of 1.01 false alert episodes per patient-day, and a median lead time of 80 min (vs 95). The doctor can still move the sensitivity slider.
+
+## D-026 The twin sees only observed data
+The personalised twin (`twin/`) uses the same ODE structure as the simulator but reads only what a clinic holds: the record, prescriptions with reported adherence, CGM, wearable steps and the meal log. Hidden simulator values are used only by `twin/truth.py` and `twin/validate.py` to score it. Because the model structure is identical, the validation shows best-case (no structural error) behaviour; this is stated wherever the results appear.
+
+## D-027 Personalisation method
+Record-based prior (the simulator's population links with all hidden noise switched off, reported adherence), then a coarse-to-fine grid search over insulin sensitivity, beta-cell function and the fasting set point, fitted to the first 7 days. Post-meal CGM is fitted as the rise from the reading at meal time (robust to invisible day-level shifts); night-time CGM (2-6 h) is fitted as absolute level. Logged carbohydrates are divided by an assumed logging bias of 0.9 (to verify); CGM rises of 35 mg/dL or more in 45 min with no logged meal in the previous 150 min are filled with a typical meal for that time of day. A per-patient meal-size factor was tried and dropped: it absorbed input errors and shrank what-if effects (validated on 8 patients: half-portion MAE 15.2 -> 10.5 mg/dL, low-GI swap 18.4 -> 14.5 after the change).
+
+## D-028 What-if modes
+Meals, walks and one-off dose changes: simulate the next 5 hours from the twin's current state (the record replayed to "now", glucose nudged to the latest CGM corrected for sensor lag) with and without the intervention; planned doses at full adherence. Drug-regimen changes: compare day 3 of a steady-state simulation of the patient's typical day (from their own meal log) under the current vs changed regimen, reported as changes, not absolute HbA1c predictions. Every result shows "patient factors considered", the constraint verdict, a hypoglycaemia check, and "Simulation for discussion with the patient, not a prescription."
+
+## D-029 Constraints block before simulating
+Blocked options (diet, allergy, intolerance, eGFR limits, maximum doses) are never simulated and always carry their reason; warnings (age, eGFR and sulfonylurea hypoglycaemia risk, sulfonamide allergy, neuropathy before walks, large insulin steps) are simulated and shown with the result. All rules are listed in `docs/clinical_rules_to_review.md`.

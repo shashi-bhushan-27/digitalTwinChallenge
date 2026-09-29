@@ -9,7 +9,7 @@
 | Team | AMRIT_VIT (one member): **Shashi Bhushan**, team leader, shashibhushanvijay@gmail.com |
 | College | Vellore Institute of Technology (VIT), Vellore |
 | Condition | Type 2 diabetes (India) |
-| Status | Phase 1 (synthetic data + validation) and Phase 2 (prediction models + explanations) complete; Phase 3 (what-if twin) next |
+| Status | Phases 1-3 complete (synthetic data + validation, prediction models + explanations, personalised what-if twin); Phase 4 (dashboard) next |
 | Video | _link to be added (20+ minute recording)_ |
 | Architecture diagram | _docs/architecture.pdf (Phase 5)_ |
 | Presentation | _docs/presentation.pdf (Phase 5)_ |
@@ -55,6 +55,13 @@ The dataset (400 patients x 14 days) regenerates identically from one seed and i
 - **Models** (`models/train.py`): persistence and linear-extrapolation baselines; an ablation ladder of LightGBM models (CGM only, + wearables, + EHR, + meal log); the fusion model with point and quantile forecasts at 15-120 min (80 % band widened by split-conformal calibration), a peak-glucose model, and a spike-onset classifier with isotonic calibration and an alert threshold chosen on validation patients.
 - **Explanations** (`models/explain.py`): interventional TreeSHAP on the peak model against a reference cohort of similar patients, grouped into clinical concepts and rendered as templated sentences, with checks against the simulator's hidden truth.
 - **Inference API** (`models/inference.py`): one small interface the dashboard will call.
+
+### Personalised twin and what-if simulator (Phase 3, done)
+- **Personalisation** (`twin/estimate.py`): starts from the physiology implied by the record, then fits insulin sensitivity, beta-cell function and the fasting set point to a week of the patient's own CGM and meal log.
+- **What-if** (`twin/whatif.py`): swap or resize a meal (47 Indian dishes), add a walk, skip a meal, or change a dose. Each option is simulated for the next 5 hours from the twin's current state. Drug-regimen changes are compared as typical days at steady state.
+- **Constraints** (`twin/constraints.py`): diet type, allergies, intolerances and eGFR drug limits are checked before anything is simulated, and blocked options show their reason.
+- **Safety:** every result carries a hypoglycaemia check (below 70 mg/dL) and the patient's risk factors. It is labelled "Simulation for discussion with the patient, not a prescription."
+- **Twin card** (`twin/card.py`): insulin sensitivity and secretion versus similar patients, with uncertainty, plus the patient's response to a standard meal.
 
 ### Validation against real open data (Phase 1, done)
 Real data is used **only** to calibrate seven population-level settings and to validate. It is never used to train the product models.
@@ -106,8 +113,8 @@ At 60 minutes, 99.6 % of forecasts fall in Clarke zones A+B. The 80 % band cover
 
 **Spike alerts** (onset above 180 mg/dL for 15 minutes or more within 2 hours):
 - PR-AUC 0.848, AUROC 0.915, Brier 0.115.
-- At the threshold chosen on validation patients, 95.9 % of spikes are caught, with a median lead time of 95 minutes.
-- There are 1.0 false alert episodes per patient-day. A sensitivity slider trades this down to 0.27 per day, at 85 % of spikes caught.
+- At the dashboard's default threshold (0.5), 92.2 % of spikes are caught, with a median lead time of 80 minutes and 0.69 false alert episodes per patient-day.
+- A sensitivity slider trades catch rate against alert fatigue: 95.9 % caught at 1.0 false alerts per day (threshold 0.36), or 85 % caught at 0.27 per day (threshold 0.7).
 
 ![alert trade-off](results/models/alert_tradeoff.png)
 
@@ -126,6 +133,29 @@ The honest conclusion: with hours of CGM history, the glucose trace already carr
 - Similar moments get similar explanations: cosine similarity 0.75, against 0.04 for random pairs.
 
 One check went the "wrong" way, and it teaches something. After a post-meal walk the model predicts a larger rise, and the data show why: glucose is temporarily suppressed while the meal is still being absorbed. SHAP describes what the model relied on, not the effect of an intervention. That is why what-if questions go to the ODE twin (Phase 3).
+
+### Phase 3: the personalised twin and what-if (60 test patients)
+
+**What the twin knows.** It uses only what a clinic holds: the record, prescriptions with reported adherence, CGM, steps and the patient's own meal log. It never reads the simulator's hidden values. A week of data personalises it; later days test it.
+
+**What-if answers vs the truth.** Only synthetic data allows this check: each patient is replayed with the intervention applied to their true meals, doses and activity, and the result is compared with the twin's prediction. For a held-out dinner (50 patients), the error in the predicted change of the 5-hour peak was:
+
+| intervention | median true change | personalised twin | record-only twin | cohort average |
+|---|---|---|---|---|
+| swap to a low-GI plate | −34 mg/dL | 14.7 | 18.2 | 31.0 |
+| half portion | −45 mg/dL | 13.8 | 14.0 | 15.5 |
+| skip the meal | −84 mg/dL | 31.5 | 33.5 | 34.7 |
+| 20-min walk after the meal | −5 mg/dL | 2.8 | 2.7 | 2.7 |
+
+The twin ranks patients well for the swap (Spearman 0.89). It under-estimates what cutting or skipping a meal would do, because it sees smaller meals than were eaten. Its predicted dinner peak is 32 mg/dL too low on average. Held-out CGM error is 35 mg/dL for the personalised twin, against 40 for the record-only twin.
+
+**Safety.** For 24 sulfonylurea users, the test scenario was "maximum dose, breakfast skipped". The twin flagged 2 of the 4 true lows and marked the other 2 as "caution" (below 80 mg/dL), with no false alarms.
+
+**Constraints first.** Options that conflict with diet, allergies, intolerances or kidney limits are never simulated, and they show the reason. For example: "Metformin 1000 → 2000 mg/day: BLOCKED, eGFR 40 (30-44): metformin limited to 1000 mg/day".
+
+![worked examples](results/twin/worked_examples.png)
+
+**What didn't work.** Fitting the physiology parameters from a week of CGM and an incomplete meal log does not recover them better than the record-based estimate. The fit still improves prediction, so the twin card shows these values with their uncertainty. Details are in [`docs/twin_report.md`](docs/twin_report.md) and [`docs/twin_examples.md`](docs/twin_examples.md).
 
 ## Repository layout
 
@@ -160,6 +190,9 @@ uv run python -m models.features                 # Phase 2: build model features
 uv run python -m models.train                    # train ladder + fusion models, write results/models (about 8 minutes)
 uv run python -m models.explain                  # explanations and their checks
 uv run python -m models.report                   # docs/model_report.md
+uv run python -m twin.validate                   # Phase 3: personalise + validate the twin on test patients (about 1 hour)
+uv run python -m twin.report                     # docs/twin_report.md
+uv run python -m twin.examples                   # worked what-if examples and plots
 ```
 
 ## Responsible-data notes (DPDP-aware design)

@@ -1,0 +1,51 @@
+# Phase 3: the ODE twin (state estimation, what-if simulation, constraints, safety checks).
+
+estimation:
+  fit_days: 7                # the first 7 observed days personalise the twin; later days test it
+  start_skip_h: 6            # ignore the first hours of the fit (the ODE settles from steady state)
+  cgm_lag_min: 10            # compare CGM with simulated plasma glucose passed through this lag
+  residual_sd_mgdl: 18       # noise scale for the fit (sensor + unmodelled behaviour)
+  autocorr_thinning: 6       # effective independent points = points / thinning
+  grid:
+    si_log: [-1.2, 1.2, 13]      # log multiplier on the record-based prior
+    beta_log: [-1.2, 1.2, 13]
+    carb_scale: [0.7, 0.9, 1.1, 1.3]   # nuisance factor: logged-carb bias plus unobservable day-level variation
+  refine: {rounds: 2, points: 7, shrink: 0.35}
+  prior_sd: {si_log: 0.35, beta_log: 0.35, carb_scale_log: 0.30}
+  fit_carb_scale: false      # true = also fit a per-patient meal-size factor (tested; it absorbed input errors and shrank what-if effects)
+  carb_scale_prior_centre: 1.0
+  carb_scale_bounds: [0.45, 1.8]
+  logging_bias: {value: 0.9, source: "assumption: people log about 10 % fewer carbohydrates than they eat (dietary under-reporting); check dietary-assessment literature", verified: false}
+  post_meal_window_min: 180
+  night_window_h: [2, 6]
+  unlogged_meals:            # CGM rises with no logged meal are filled with a typical meal
+    rise_mgdl: 35
+    over_min: 45
+    no_log_before_min: 150
+    merge_min: 120
+    default_carbs_by_slot: {breakfast: 45, lunch: 70, snack: 25, dinner: 65, night: 25}
+  default_meal_macros: {fat_per_g_carb: 0.18, protein_per_g_carb: 0.18, fibre_per_g_carb: 0.07, gi: high}
+
+whatif:
+  horizon_h: 5
+  hypo_threshold_mgdl: 70
+  caution_threshold_mgdl: 80
+  spike_threshold_mgdl: 180
+  walk_defaults: {duration_min: 20, cadence_spm: 100, start_after_meal_min: 20}
+  typical_day_days: 3        # drug-regimen what-ifs compare day 3 at steady state
+  label: "Simulation for discussion with the patient, not a prescription."
+
+# Constraint rules checked before any simulation. Recalled from drug labels and guidelines;
+# NOT verified - listed in docs/clinical_rules_to_review.md for clinical review.
+constraints:
+  source: "drug labels and diabetes guidelines as recalled (metformin FDA 2016 eGFR communication; DPP-4 and SGLT2 labels); clinical review required"
+  verified: false
+  metformin: {contraindicated_below_egfr: 30, max_daily_mg_egfr_30_45: 1000, max_daily_mg: 2000}
+  sglt2_inhibitor: {do_not_start_below_egfr: 25, limited_glucose_effect_below_egfr: 45}
+  sulfonylurea:
+    max_daily_mg: {glimepiride: 8, gliclazide_mr: 120}
+    caution_age_ge: 65
+    caution_egfr_lt: 60
+  sitagliptin_renal_mg: {egfr_below_45: 50, egfr_below_30: 25}
+  basal_insulin: {max_step_fraction: 0.2}
+  hypo_risk_factors: {age_ge: 65, egfr_lt: 45, drug_classes: [sulfonylurea, basal_insulin]}

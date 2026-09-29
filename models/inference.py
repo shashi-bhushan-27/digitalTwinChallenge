@@ -42,7 +42,10 @@ class TwinPredictor:
 
     @property
     def threshold(self) -> float:
-        return float(self.meta["threshold"])
+        """Dashboard default alert threshold (configs/models.yaml, decision D-025); falls back to the
+        validation max-F1 point stored with the model."""
+        default = config.load("models").get("alerts", {}).get("default_threshold")
+        return float(default if default is not None else self.meta["threshold"])
 
     def calibrate(self, raw: np.ndarray) -> np.ndarray:
         iso = self.meta["isotonic"]
