@@ -45,5 +45,15 @@ Status: `[x]` done, `[~]` in progress, `[ ]` to do. Updated at the end of each w
 - [x] Triage ranked by severity; sensitivity slider with test-set operating point; replay (play + "what actually happened")
 - [x] About this twin: evaluation, real-data validation, what-if validation, limitations and provenance
 - [x] Headless tests (AppTest): all scenes, what-if run, time controls, no raw feature names on screen
-- [ ] Screenshots for the README and slides (Phase 5)
+- [x] Screenshots for the README and slides (`scripts/screenshot_dashboard.py`)
+- [x] Triage one-line reason: plain sentence, and time of day skipped (it is the same for every patient at one clinic time)
 ## Phase 5: Submission package
+- [x] Gap check against the brief and the submission checklist (README "Submission checklist" table)
+- [x] Architecture diagram: `docs/architecture.pdf` + PNG (`scripts/build_architecture.py`)
+- [x] Presentation: `docs/presentation.pptx` with speaker notes + `docs/presentation.pdf` (`scripts/presentation/`)
+- [x] README: title, team, problem and use case, technical stack, AI/ML models, licence, architecture, quick start, checklist
+- [x] Video script of about 20 minutes (`docs/video_script.md`)
+- [x] Release bundle (demo data + models) and `dashboard/fetch_demo.py` with SHA-256 check
+- [x] Public repo pushed; release v0.1 with the bundle
+- [ ] Record the video, upload as unlisted YouTube, add the link to the README (team)
+- [ ] Submit on Unstop: leader name, phone, email, repo link (team)

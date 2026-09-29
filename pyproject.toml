@@ -24,6 +24,7 @@ dependencies = [
 dev = [
     "pytest>=8.3",
     "ruff>=0.6",
+    "websockets>=13",  # scripts/screenshot_dashboard.py (headless Chrome)
 ]
 
 [tool.uv]

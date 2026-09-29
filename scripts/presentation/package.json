@@ -1,0 +1,8 @@
+{
+  "name": "t2d-twin-presentation",
+  "private": true,
+  "description": "Builds docs/presentation.pptx (node build_presentation.cjs)",
+  "dependencies": {
+    "pptxgenjs": "^3.12.0"
+  }
+}

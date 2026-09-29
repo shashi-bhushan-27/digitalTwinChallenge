@@ -241,6 +241,8 @@ Headline test-set numbers; four sub-tabs: fusion vs baselines (ablation, calibra
 
 ### 7.1 Suggested structure (about 23 minutes)
 
+_The recording plan was later tightened to about 20 minutes, in step with the slide deck: see [`video_script.md`](video_script.md). The table below is the longer original version._
+
 | Time | Section | What to show | What to say (key points) |
 |---|---|---|---|
 | 0:00-1:00 | Title and team | Title slide | Project name, team AMRIT_VIT, Shashi Bhushan, VIT Vellore, Digital Twin Challenge 2026. |

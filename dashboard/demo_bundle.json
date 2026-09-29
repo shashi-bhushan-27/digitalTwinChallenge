@@ -1,0 +1,11 @@
+{
+  "version": "v0.1",
+  "file": "t2d_twin_demo_v0.1.zip",
+  "url": "https://github.com/shashi-bhushan-27/digitalTwinChallenge/releases/download/v0.1/t2d_twin_demo_v0.1.zip",
+  "sha256": "37c105c9d4a5bbd3c91fe7a150e61ca990a25cd022ece189c034cea2d54dc111",
+  "bytes": 54240306,
+  "contents": [
+    "data/demo",
+    "models/artifacts"
+  ]
+}

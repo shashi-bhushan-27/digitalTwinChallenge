@@ -34,3 +34,12 @@ results/models/test_predictions.parquet
 # Dashboard demo cache (rebuilt with `uv run python -m dashboard.prepare`)
 data/demo/*
 !data/demo/.gitkeep
+
+# Node dependencies of the slide builder
+scripts/presentation/node_modules/
+
+# Release bundle (uploaded to the GitHub release, not committed)
+dist/
+
+# Office lock files
+~$*

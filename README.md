@@ -8,12 +8,27 @@
 |---|---|
 | Team | AMRIT_VIT (one member): **Shashi Bhushan**, team leader, shashibhushanvijay@gmail.com |
 | College | Vellore Institute of Technology (VIT), Vellore |
+| Project title | T2D Digital Twin: a virtual Type 2 diabetes patient for 2-hour glucose-spike prediction and what-if simulation |
 | Condition | Type 2 diabetes (India) |
-| Status | Phases 1-4 complete (synthetic data + validation, prediction models + explanations, personalised what-if twin, dashboard); Phase 5 (submission package) next |
-| Video | _link to be added (20+ minute recording)_ |
-| Architecture diagram | _docs/architecture.pdf (Phase 5)_ |
-| Presentation | _docs/presentation.pdf (Phase 5)_ |
-| Licence | MIT (see [LICENSE](LICENSE)); third-party data keep their own licences (below) |
+| Status | Working prototype: synthetic data with real-data validation, prediction models with explanations, personalised what-if twin, doctor-facing dashboard |
+| Demo video | _Unlisted YouTube link to be added (about 20 minutes; script in [docs/video_script.md](docs/video_script.md))_ |
+| Architecture diagram | [docs/architecture.pdf](docs/architecture.pdf) (preview [below](#architecture)) |
+| Presentation | [docs/presentation.pdf](docs/presentation.pdf) · [docs/presentation.pptx](docs/presentation.pptx) (with speaker notes) |
+| Licence | MIT (see [LICENSE](LICENSE)); third-party data keep their own licences ([below](#data-sources-and-licences)) |
+
+![dashboard: patient view](docs/img/dashboard_patient.png)
+
+## Quick start (about 5 minutes)
+
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/). This downloads the ready-made demo data (60 synthetic test patients) and trained models from the [v0.1 release](https://github.com/shashi-bhushan-27/digitalTwinChallenge/releases/tag/v0.1), checks the SHA-256, and opens the dashboard:
+
+```bash
+uv sync
+uv run python -m dashboard.fetch_demo
+uv run streamlit run dashboard/app.py
+```
+
+To rebuild everything from scratch instead (about 1.5 hours), see [Setup and run](#setup-and-run).
 
 ## Problem and healthcare use case
 
@@ -22,25 +37,20 @@ India has one of the world's largest populations with Type 2 diabetes, and many 
 This project builds a **digital twin** of a person with T2D: a virtual patient that fuses the **static record** (EHR: demographics, labs, medications, allergies, diet) with **dynamic streams** (CGM every 5 minutes, heart rate, HRV, sleep stages, steps) in order to:
 
 1. **Predict a glucose spike about 2 hours ahead** (event detection with a calibrated probability, plus a forecast with an uncertainty band);
-2. **Explain why** in clinical language (grouped SHAP drivers such as "large evening carbohydrate load" or "poor sleep last night");
+2. **Explain why** in clinical language (grouped SHAP drivers in mg/dL, such as "Logged meal of about 80 g carbohydrate 1 min ago: +37" or "Last 24 h: 71 % time in range, mean 168 mg/dL; similar patients 185: −5");
 3. **Let the doctor ask "what if?"** (swap dinner, add a post-meal walk, change a drug dose or timing) on a physiological model of that patient, with constraint checks (allergies, diet, kidney function) and a hypoglycaemia safety flag.
 
 No real patient data is used anywhere (DPDP Act and HIPAA): the patients are simulated, and real open datasets are used only to calibrate and validate the simulator.
 
+**Scope.** The brief lists genetic markers as one possible static input. They are deliberately left out: no genotype fields, pharmacogenomic flags or genetic risk scores (see [Future work](#future-work)). Every record field has a job in the twin instead: it changes the simulated physiology (HbA1c, BMI, liver status, medicines), limits what the what-if simulator may offer (allergies, intolerances, diet type, eGFR), or gives the doctor context (lipids, blood pressure, comorbidities).
+
 ## How it works
 
-```
- EHR cohort (copula) ──► hidden physiology ──► behaviour (Indian meals, walks, sleep, stress)
-                              │                         │
-                              ▼                         ▼
-                    glucose-insulin ODE  ◄── meals, doses taken, exercise
-                              │
-                              ▼
-                 sensor layer (CGM lag/noise/gaps, wearable artefacts)
-                              │
-        observed tables ──────┴────► models (Phase 2) ──► dashboard (Phase 4)
-        truth tables (hidden) ─────► validation of data and explanations only
-```
+### Architecture
+
+[![architecture](docs/architecture.png)](docs/architecture.pdf)
+
+The generator's four layers produce two separate stores: what a clinic would observe (record, CGM, wearables, meal log) and the simulator's hidden truth (true glucose, meals eaten, doses taken). Models and the twin read only the observed store; the hidden truth is used only to validate. Real open datasets touch calibration and validation only. The dashboard calls the models and the twin through one small service layer (`dashboard/service.py`, `models/inference.py`).
 
 ### Synthetic data generator (Phase 1, done)
 - **Cohort layer** (`data_gen/cohort.py`): a Gaussian copula over age, BMI, waist, HbA1c, fasting glucose, diabetes duration, eGFR, ALT, lipids and blood pressure with Indian-clinic-style marginals; then fatty liver, comorbidities, allergies and intolerances, region and diet type (vegetarian, non-vegetarian, Jain), habits, a 12-month HbA1c history and medications (metformin, sulfonylureas, DPP-4 and SGLT2 inhibitors, basal insulin) assigned by eGFR-aware rules. No genetic fields.
@@ -54,7 +64,7 @@ The dataset (400 patients x 14 days) regenerates identically from one seed and i
 - **Features** (`models/features.py`) are built only from what a clinic would observe up to the prediction time (a test changes the future and checks nothing earlier moves): CGM level, lags, trends, variability and excursion shape; steps, heart rate, last night's sleep and HRV; the patient's own meal log; the EHR record and prescription schedule.
 - **Models** (`models/train.py`): persistence and linear-extrapolation baselines; an ablation ladder of LightGBM models (CGM only, + wearables, + EHR, + meal log); the fusion model with point and quantile forecasts at 15-120 min (80 % band widened by split-conformal calibration), a peak-glucose model, and a spike-onset classifier with isotonic calibration and an alert threshold chosen on validation patients.
 - **Explanations** (`models/explain.py`): interventional TreeSHAP on the peak model against a reference cohort of similar patients, grouped into clinical concepts and rendered as templated sentences, with checks against the simulator's hidden truth.
-- **Inference API** (`models/inference.py`): one small interface the dashboard will call.
+- **Inference API** (`models/inference.py`): one small interface the dashboard calls.
 
 ### Personalised twin and what-if simulator (Phase 3, done)
 - **Personalisation** (`twin/estimate.py`): starts from the physiology implied by the record, then fits insulin sensitivity, beta-cell function and the fasting set point to a week of the patient's own CGM and meal log.
@@ -64,12 +74,18 @@ The dataset (400 patients x 14 days) regenerates identically from one seed and i
 - **Twin card** (`twin/card.py`): insulin sensitivity and secretion versus similar patients, with uncertainty, plus the patient's response to a standard meal.
 
 ### Doctor-facing dashboard (Phase 4, done)
-`uv run streamlit run dashboard/app.py` (after `uv run python -m dashboard.prepare`). Four tabs:
+`uv run streamlit run dashboard/app.py` (after `uv run python -m dashboard.fetch_demo`, or `uv run python -m dashboard.prepare` when the full pipeline has been run). Four tabs:
 - **Patient:** synthetic patient header with a red/amber/green alert chip, and one plain-language sentence, for example "Spike likely (90 %): above 180 in about 50 min, peak about 214 mg/dL (80 % range 193-263)". The main chart shows the last 24 h of CGM plus the 2-hour forecast with its band, and steps, heart rate, sleep stages and HRV sit on the same time axis. It also has "why this prediction" in clinical sentences, the record with allergy badges, and the twin state.
 - **What-if:** meal swaps from the Indian dish library, portion changes, a walk, skipping a meal, or a medicine change, all simulated on the patient's personalised twin. Blocked options are listed with their reasons, and every result carries a hypoglycaemia check.
 - **Triage:** every patient at the chosen clinic time, predicted lows first, then the highest predicted 2-hour peak, each with a one-line reason.
 - **About this twin:** evaluation, real-data validation, what-if validation, limitations and data provenance.
 - **Throughout:** an alert-sensitivity slider (showing the test-set catch rate and false alerts per day), a replay control that steps the twin forward, and "show what actually happened" for the demo. Three scripted demo scenes (a correct alert, a stable patient, and a moment where the model says it is unsure) are picked automatically from held-out days.
+
+| What-if on the personalised twin | Triage across patients |
+|---|---|
+| ![what-if](docs/img/dashboard_whatif.png) | ![triage](docs/img/dashboard_triage.png) |
+
+A component-by-component guide to the screen, and how the whole flow works, is in [`docs/project_guide.md`](docs/project_guide.md).
 
 ### Validation against real open data (Phase 1, done)
 Real data is used **only** to calibrate seven population-level settings and to validate. It is never used to train the product models.
@@ -78,7 +94,33 @@ Real data is used **only** to calibrate seven population-level settings and to v
 
 Results are in [`docs/validation_report.md`](docs/validation_report.md) (summary below).
 
-## Results so far
+## Technical stack
+
+| Layer | Tools |
+|---|---|
+| Language and environment | Python 3.12, [uv](https://docs.astral.sh/uv/) with a locked environment (`uv.lock`) |
+| Data | NumPy, pandas, PyArrow (Parquet), SciPy (copula, statistics), YAML configs with a source and "verified" tag on every literature value |
+| Simulation | Own vectorised glucose-insulin ODE (hybrid Bergman minimal model / Dalla Man), 1-minute Euler steps, deterministic seeding |
+| Machine learning | LightGBM (point, quantile and classification models), scikit-learn (isotonic calibration, metrics, real-vs-synthetic discriminator), SHAP (TreeSHAP) |
+| Dashboard | Streamlit + Plotly, with a service layer between the UI and the models |
+| Figures and reports | Matplotlib; Markdown reports generated from the result files |
+| Quality | pytest (75 tests: value ranges, missingness, determinism, leakage, constraints, dashboard), Ruff |
+| Submission material | pptxgenjs (slides), headless Chrome (architecture PDF, dashboard screenshots) |
+
+## AI/ML models and framework
+
+| Model | Framework | Role | Key result (held-out synthetic test patients) |
+|---|---|---|---|
+| **Fusion forecaster**: CGM + wearables + EHR + meal-log features, 15-120 min | LightGBM regression, quantile objective (10th/90th) + split-conformal widening | Glucose forecast with an 80 % band | MAE 14.1 mg/dL at 60 min (persistence 24.6); band covers 79 % |
+| **Peak model** | LightGBM regression | Predicted 2-hour peak, the quantity the explanations describe | used for the "why" panel |
+| **Spike classifier** | LightGBM binary + isotonic calibration | Probability that CGM exceeds 180 mg/dL for 15+ min within 2 h | PR-AUC 0.848, AUROC 0.915, Brier 0.115; 92 % of spikes caught 80 min ahead at 0.69 false alerts/day |
+| **Explanations** | SHAP (interventional TreeSHAP) against similar patients | Grouped clinical drivers in mg/dL, as sentences | top-driver, deletion and consistency checks pass |
+| **ODE twin** | Own hybrid Bergman / Dalla Man model, personalised by a grid fit to a week of CGM and meal log | What-if answers, twin state card, hypoglycaemia check | beats the cohort average for every meal change; right direction for 94 % |
+| **Baselines** | persistence, linear extrapolation, CGM-only LightGBM | Ablation ladder showing what each stream adds | see [Results](#results) |
+
+Deep learning (transformers or recurrent networks) was deliberately not used: gradient-boosted trees are fast to train, strong on tabular features and give exact SHAP values, and the physiology model carries the mechanisms needed for what-if questions.
+
+## Results
 
 Every number below comes from a pipeline run (dataset v0.1, seed 20261020). Details are in [`docs/validation_report.md`](docs/validation_report.md), [`docs/model_report.md`](docs/model_report.md) and [`docs/data_card.md`](docs/data_card.md). The models are trained and tested on synthetic patients, so their scores describe the simulated world and are an upper bound for real patients.
 
@@ -184,16 +226,18 @@ data_gen/       cohort, physiology (ODE twin core), behaviour, sensors, generate
 validation/     real-data download and loaders, metrics, level-matched comparison,
                 calibration, discriminator, TSTR, report
 models/         Phase 2: features, baselines, LightGBM fusion, calibration, SHAP
-twin/           Phase 3: what-if simulator (constraints, safety checks)
-dashboard/      Phase 4: Streamlit + Plotly
-docs/           decisions, data dictionary, data card, validation report, review lists, tasks
+twin/           Phase 3: personalised ODE twin, what-if simulator (constraints, safety checks), validation
+dashboard/      Phase 4: Streamlit + Plotly app, service layer, demo-cache builder, release download
+docs/           architecture, presentation, video script, project guide, decisions, data dictionary,
+                data card, validation / model / twin reports, review lists, tasks
 results/        metrics and figures produced by the pipeline (only numbers from actual runs)
+scripts/        architecture diagram, slide deck, dashboard screenshots, release bundle
 tests/          one test module per layer + determinism and leakage tests
 ```
 
 ## Setup and run
 
-Requires Python 3.12 and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/). The [quick start](#quick-start-about-5-minutes) downloads a ready-made demo; the steps below rebuild everything from the code.
 
 ```bash
 uv sync                                          # create the environment from uv.lock
@@ -215,12 +259,14 @@ uv run python -m dashboard.prepare               # Phase 4: build the dashboard'
 uv run streamlit run dashboard/app.py            # open the dashboard at http://localhost:8501
 ```
 
+Submission material (optional to rebuild): `uv run python scripts/build_architecture.py` (needs Google Chrome) writes `docs/architecture.pdf`; `cd scripts/presentation && npm install && node build_presentation.cjs` writes `docs/presentation.pptx`; `uv run python scripts/screenshot_dashboard.py` captures the dashboard images from a running app; `uv run python scripts/make_demo_bundle.py` packs the release asset.
+
 ## Responsible-data notes (DPDP-aware design)
 - No personal data is collected, stored or processed: every patient is simulated.
 - Real open datasets stay outside the repository (`data/real/` is gitignored); only download scripts are shared, and licences are respected (CGMacros is non-commercial, share-alike).
 - Hidden simulator state is stored separately from what a clinic would observe, and tests check that no hidden field leaks into model inputs.
 - Every assumption taken from literature is tagged and listed for verification; nothing is presented as a clinical fact until checked.
-- The dashboard will always show "Synthetic patient. Decision support only."
+- The dashboard always shows "Synthetic patient. Decision support only.", and every what-if result is labelled a simulation for discussion, not a prescription.
 
 ## Limitations
 - Simulated physiology encodes our assumptions; models trained on it can partly rediscover them (circularity). Hidden variation and validation on real CGM reduce but do not remove this. Performance on synthetic data is an upper bound.
@@ -230,7 +276,34 @@ uv run streamlit run dashboard/app.py            # open the dashboard at http://
 ## Future work
 - Genetic risk and pharmacogenomic markers (deliberately out of scope for this prototype).
 - Calibrate against an Indian CGM cohort if an open one becomes available; prandial and premixed insulin; GLP-1 receptor agonists.
+- Clinical review of the constraint rules and explanation sentences; a silent-mode prospective study before any clinical use.
+- Patient-side nudges (WhatsApp / SMS) and regional-language summaries.
+
+## Open-source licence
+- **Code, documentation, synthetic data and trained models in this repository:** [MIT licence](LICENSE), copyright 2026 Shashi Bhushan (Team AMRIT_VIT).
+- **Third-party datasets** are not redistributed. `validation/real_data/download.py` fetches them from their publishers, and they keep their own licences (below). CGMacros is non-commercial and share-alike, so nothing derived from it is shipped here beyond summary statistics in the reports.
+- **Main libraries:** NumPy, pandas, SciPy, scikit-learn, Matplotlib (BSD); LightGBM, SHAP, PyArrow, Plotly (MIT or Apache 2.0); Streamlit (Apache 2.0); pptxgenjs (MIT).
 
 ## Data sources and licences
 - Shanghai T2DM / T1DM datasets: Zhao Q. et al., "Chinese diabetes datasets for data-driven machine learning", Scientific Data (2023); figshare, CC BY 4.0.
 - CGMacros v1.0.0: PhysioNet, CC BY-NC-SA 4.0.
+- Indian diabetes prevalence quoted in the presentation: Anjana R.M. et al. (ICMR-INDIAB), The Lancet Diabetes & Endocrinology (2023).
+
+## Submission checklist
+
+| Required item | Where |
+|---|---|
+| Team details, college | [top of this README](#t2d-digital-twin-a-virtual-type-2-diabetes-patient-for-2-hour-glucose-spike-prediction-and-what-if-simulation) |
+| Project title | top of this README |
+| Problem statement and healthcare use case | [Problem and healthcare use case](#problem-and-healthcare-use-case) |
+| Technical stack | [Technical stack](#technical-stack) |
+| AI/ML model and framework details | [AI/ML models and framework](#aiml-models-and-framework), [`docs/model_report.md`](docs/model_report.md), [`docs/twin_report.md`](docs/twin_report.md) |
+| Demo video (unlisted YouTube) | first table above (link to be added) |
+| Open-source licence | [Open-source licence](#open-source-licence), [LICENSE](LICENSE) |
+| Architecture diagram (PDF) | [`docs/architecture.pdf`](docs/architecture.pdf) |
+| Presentation (PDF / PPT) | [`docs/presentation.pdf`](docs/presentation.pdf), [`docs/presentation.pptx`](docs/presentation.pptx) |
+| Working prototype and code | this repository; [quick start](#quick-start-about-5-minutes) |
+| Static + dynamic data fusion | [Synthetic data generator](#synthetic-data-generator-phase-1-done), [`docs/data_dictionary.md`](docs/data_dictionary.md), [`docs/data_card.md`](docs/data_card.md) |
+| Model that predicts an adverse event | [Prediction models](#prediction-models-and-explanations-phase-2-done), [Results](#results) |
+| Doctor-facing dashboard | [Doctor-facing dashboard](#doctor-facing-dashboard-phase-4-done), [`docs/project_guide.md`](docs/project_guide.md) |
+| Only anonymised, open or synthetic data | [Responsible-data notes](#responsible-data-notes-dpdp-aware-design) |
