@@ -7,11 +7,11 @@
 # (Anjana RM et al., Lancet Diabetes & Endocrinology, 2023) and Indian clinic-cohort reports.
 
 sex:
-  p_male: {value: 0.55, source: "assumption: slight male excess in Indian T2D clinic cohorts; check ICMR-INDIAB", verified: false}
+  p_male: {value: 0.55, source: "assumption: slight male excess in Indian T2D clinic cohorts; check ICMR-INDIAB. Checked 2026-10-18 (open): Pune lifestyle program (Sci Rep 2025, n=18950) is 64.6% male; a Mumbai clinic abstract gives 55%; ICMR-INDIAB has no T2D sex split.", verified: false}
 
 height_cm:   # used only to turn BMI into weight
-  male: {mean: 166.5, sd: 6.5, source: "assumption: Indian adult height (NFHS-type surveys); check", verified: false}
-  female: {mean: 153.0, sd: 6.0, source: "assumption: Indian adult height (NFHS-type surveys); check", verified: false}
+  male: {mean: 166.5, sd: 6.5, source: "assumption: Indian adult height (NFHS-type surveys); check. Checked 2026-10-18 (open): NFHS height-trend paper (PMC8448320) gives changes, not absolute means; no source for 166.5 found.", verified: false}
+  female: {mean: 153.0, sd: 6.0, source: "assumption: Indian adult height (NFHS-type surveys); check. Checked 2026-10-18 (open): NFHS height-trend paper (PMC8448320) gives changes, not absolute means; no source for 153.0 found.", verified: false}
 
 # Gaussian-copula marginals. dist: normal | lognormal | shifted_lognormal.
 #   normal: mean, sd.  lognormal: median, sigma (of log).  shifted_lognormal: shift + lognormal.
@@ -19,48 +19,48 @@ height_cm:   # used only to turn BMI into weight
 continuous:
   age_yr:
     {dist: normal, mean: 52.0, sd: 10.5, min: 28, max: 80,
-     source: "assumption: Indian T2D clinic age profile (earlier onset than Western cohorts); check ICMR-INDIAB", verified: false}
+     source: "Pune lifestyle program, Sci Rep 2025 (PMC11937334, n=18950, ages 18-70): mean 52.7, SD 10.6. Checked 2026-10-18; DiabCare India 2011 mean 51.9 (SD 12.4). Clip bounds 28-80 not tested.", verified: true}
   bmi:
     {dist: lognormal, median: 26.3, sigma: 0.15, min: 18.0, max: 42.0,
-     source: "assumption: Indian T2D mean BMI ~26-27, lower than Western T2D; check ICMR-INDIAB", verified: false}
+     source: "assumption: Indian T2D mean BMI ~26-27, lower than Western T2D; check ICMR-INDIAB. Checked 2026-10-18 (corrected-suggested, not changed): Pune program medians 27.5 (male) and 29 (female); LANDMARC mean 27.2; model median 26.3 with a wider spread than the Pune IQR implies.", verified: false}
   waist_cm:
     {dist: normal, mean: 94.0, sd: 9.0, min: 70, max: 135, sex_offset_female: -4.0,
-     source: "assumption: central obesity at modest BMI (Asian Indian phenotype); check", verified: false}
+     source: "assumption: central obesity at modest BMI (Asian Indian phenotype); check. Checked 2026-10-18 (open): none of the Indian T2D sources retrieved reports waist circumference.", verified: false}
   hba1c_pct:
     {dist: shifted_lognormal, shift: 5.5, median: 2.75, sigma: 0.42, min: 5.8, max: 14.0,
-     source: "assumption: median ~8.2%, right-skewed, poor control common in India; check ICMR-INDIAB / clinic audits", verified: false}
+     source: "assumption: median ~8.2%, right-skewed, poor control common in India; check ICMR-INDIAB / clinic audits. Checked 2026-10-18 (corrected-suggested, not changed): Pune program n=18950 mean 8.1 SD 1.8, 70.0% at 7% or more; LANDMARC mean 8.0. Model mean about 8.5, SD about 1.3, about 92% at 7% or more.", verified: false}
   fpg_mgdl:
     {dist: shifted_lognormal, shift: 80.0, median: 70.0, sigma: 0.45, min: 85, max: 380,
-     source: "assumption: median ~150 mg/dL, consistent with the HbA1c marginal; check", verified: false}
+     source: "assumption: median ~150 mg/dL, consistent with the HbA1c marginal; check. Checked 2026-10-18 (corrected-suggested, not changed): Pune program median 131 (IQR 110-162), 86.6% above 100 mg/dL. Model median 150, about 99.7% above 100.", verified: false}
   duration_yr:
     {dist: lognormal, median: 6.0, sigma: 0.8, min: 0.3, max: 35,
-     source: "assumption: clinic population with median ~6 y since diagnosis; check", verified: false}
+     source: "assumption: clinic population with median ~6 y since diagnosis; check. Checked 2026-10-18 (corrected-suggested, not changed): Pune program 74.4% had 6 or more years (model median 6 gives 50%); DiabCare 2011 mean 6.9 y; LANDMARC mean 8.6 y.", verified: false}
   egfr:
     {dist: normal, mean: 86.0, sd: 19.0, min: 20, max: 125,
-     source: "assumption: ~10% with eGFR < 60 in Indian T2D clinics; check", verified: false}
+     source: "assumption: ~10% with eGFR < 60 in Indian T2D clinics; check. Checked 2026-10-18 (corrected-suggested, not changed): Pune program mean 100.4 SD 21.5, 3.7% below 60 (model mean 86, about 9% below 60). The 2025 CITE multicentre study reports 32% composite CKD, not eGFR-only.", verified: false}
   alt_ul:
     {dist: lognormal, median: 28.0, sigma: 0.45, min: 8, max: 220,
-     source: "assumption; check", verified: false}
+     source: "assumption; check. Checked 2026-10-18 (open): no ALT data in the Indian T2D sources retrieved.", verified: false}
   tg_mgdl:
     {dist: lognormal, median: 150.0, sigma: 0.45, min: 45, max: 900,
-     source: "assumption: atherogenic dyslipidaemia (high TG, low HDL) typical in South Asians; check", verified: false}
+     source: "assumption: atherogenic dyslipidaemia (high TG, low HDL) typical in South Asians; check. Checked 2026-10-18 (corrected-suggested, not changed): Pune program mean 153.7 SD 97.9 implies a lognormal median of about 130 and sigma of about 0.58 (model 150 and 0.45).", verified: false}
   ldl_mgdl:
     {dist: normal, mean: 104.0, sd: 32.0, min: 35, max: 250,
-     source: "assumption; check", verified: false}
+     source: "assumption; check. Checked 2026-10-18 (open): Pune program mean 104.2 (model 104) but SD 38.3 vs model 32; not confirmed.", verified: false}
   hdl_mgdl:
     {dist: normal, mean: 40.0, sd: 8.5, min: 20, max: 90, sex_offset_female: 5.0,
-     source: "assumption: low HDL typical in South Asians; check", verified: false}
+     source: "Pune lifestyle program, Sci Rep 2025 (PMC11937334, n=18950): male 40.2 SD 9.0, female 45.6 SD 10.5, overall 42.1 SD 9.9. Checked 2026-10-18.", verified: true}
   sbp_mmhg:
     {dist: normal, mean: 132.0, sd: 15.0, min: 95, max: 200,
-     source: "assumption; check", verified: false}
+     source: "assumption; check. Checked 2026-10-18 (open): Pune program gives only 24.8% at 140/90 or more and no SBP mean; not confirmed.", verified: false}
   dbp_mmhg:
     {dist: normal, mean: 82.0, sd: 9.0, min: 55, max: 120,
-     source: "assumption; check", verified: false}
+     source: "assumption; check. Checked 2026-10-18 (open): no DBP mean in the sources retrieved.", verified: false}
 
 # Pairwise Spearman-like correlations on the latent normal scale (design assumptions; the
 # matrix is repaired to the nearest valid correlation matrix if needed). Unlisted pairs are 0.
 correlations:
-  source: "design assumption: signs from general clinical knowledge, sizes chosen to be moderate; check against a real cohort if one becomes available"
+  source: "design assumption: signs from general clinical knowledge, sizes chosen to be moderate; check against a real cohort if one becomes available. Checked 2026-10-18 (open): no published source gives these latent-scale correlations; not checkable from marginal statistics."
   verified: false
   pairs:
     - [age_yr, bmi, -0.10]
@@ -120,7 +120,7 @@ region:   # shapes the meal library (rice- vs wheat-based staples)
 diet:
   p_vegetarian_by_region:
     {north: 0.40, south: 0.25, west: 0.45, east: 0.10,
-     source: "assumption: regional vegetarianism differs widely in India; check NFHS", verified: false}
+     source: "assumption: regional vegetarianism differs widely in India; check NFHS. Checked 2026-10-18 (open): NFHS-5 pooled never-eat-non-veg is about 16.6% of men and 29.4% of women (press reports; state tables not retrieved); region-weighted model mean is about 30%.", verified: false}
   p_jain_given_vegetarian: 0.08   # design choice: enough Jain patients to exercise the constraint
 
 activity:
@@ -130,7 +130,7 @@ activity:
   typical_steps: {sedentary: 3800, lightly_active: 6200, moderately_active: 8800}
 
 fatty_liver:
-  prevalence: {value: 0.55, source: "assumption: NAFLD very common in Indian T2D (ultrasound series); check", verified: false}
+  prevalence: {value: 0.55, source: "assumption: NAFLD very common in Indian T2D (ultrasound series); check. Checked 2026-10-18 (open): single-centre Indian T2D ultrasound series give 47.5% (n=122), 59% (n=100) and 84.2% (n=601); 55% is inside that range; no national figure.", verified: false}
   weights: {waist_cm: 0.9, alt_ul: 0.8, tg_mgdl: 0.5, hba1c_pct: 0.2}
 
 comorbidities:
@@ -145,19 +145,19 @@ comorbidities:
     hdl_low_female: 50
     p_treated_normal_lipids: 0.30
   coronary_artery_disease:
-    {base_prevalence: 0.08, source: "assumption; check", verified: false}
+    {base_prevalence: 0.08, source: "assumption; check. Checked 2026-10-18 (open): no Indian T2D CAD prevalence found; the Pune program does not report CAD.", verified: false}
   hypothyroidism:
-    {p_female: 0.12, p_male: 0.04, source: "assumption; check", verified: false}
+    {p_female: 0.12, p_male: 0.04, source: "assumption; check. Checked 2026-10-18 (corrected-suggested, not changed): Kerala T2D cohort (PMC6106958, n=1152) clinical hypothyroidism is 17.6% of women (72/410) and 5.5% of men (41/742) by our count; model 12% and 4%.", verified: false}
   peripheral_neuropathy:
-    {base_prevalence: 0.20, source: "assumption: rises with duration and HbA1c; check", verified: false}
+    {base_prevalence: 0.20, source: "assumption: rises with duration and HbA1c; check. Checked 2026-10-18 (open): Indian sources range from 13% (Sosale 2014, newly diagnosed, n=4600) to 26% (CURES-55, urban Chennai); 20% is inside that range; definitions differ.", verified: false}
   ckd_egfr_threshold: 60
 
 family_history:
-  diabetes: {value: 0.55, source: "assumption: strong family history common in Indian T2D; check", verified: false}
+  diabetes: {value: 0.55, source: "assumption: strong family history common in Indian T2D; check. Checked 2026-10-18 (open): sources disagree: 52% (2025 single-centre abstract, n=328 new cases), about 54% (older South Indian survey of 976 families, our calculation), 79.3% (Pune program, n=18646).", verified: false}
   premature_cvd: 0.15
 
 allergies:   # prevalence per patient; kept low but non-zero so the what-if constraints fire
-  source: "assumption: low single-digit prevalences; check Indian allergy literature"
+  source: "assumption: low single-digit prevalences; check Indian allergy literature. Checked 2026-10-18 (open): only an adult Mysore/Bangalore screen found (Mahesh 2016): probable clinical allergy about 0% peanut and shrimp, 0.05% egg, 0.5% milk; model egg 1.0% and peanut 2.5%. No national figure."
   verified: false
   food: {peanut: 0.025, tree_nut: 0.012, shellfish: 0.015, fish: 0.010, egg: 0.010, milk_protein: 0.006}
   drug: {sulfonamide_antibiotics: 0.03, penicillin: 0.04}
@@ -166,7 +166,7 @@ allergies:   # prevalence per patient; kept low but non-zero so the what-if cons
 # Medication rules. Doses and eGFR limits are labelling-type rules recalled from memory:
 # they MUST be reviewed by someone with clinical knowledge (docs/clinical_rules_to_review.md).
 medications:
-  source: "assumption: common Indian T2D prescribing; eGFR limits recalled from drug labels (metformin FDA 2016 communication, DPP-4/SGLT2 labels); clinical review required"
+  source: "assumption: common Indian T2D prescribing; eGFR limits recalled from drug labels (metformin FDA 2016 communication, DPP-4/SGLT2 labels); clinical review required. Checked 2026-10-18 (clinician review, not verified here): metformin contraindication below eGFR 30 and no initiation at 30-45 match the FDA 2016 communication; the 1000 mg cap at eGFR 30-44 is not in that label; sitagliptin renal doses match the US label as reproduced on drugs.com."
   verified: false
   metformin:
     p_base: 0.88

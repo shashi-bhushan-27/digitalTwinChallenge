@@ -1,7 +1,7 @@
 # Indian meal library: complete "plates" at a standard portion, used by the behaviour layer and
 # the what-if simulator. Macros are rough per-serving estimates (g) written for this prototype;
 # they are NOT taken from a food-composition table yet.
-source: "estimates for a prototype; check each plate against the Indian Food Composition Tables 2017 (NIN, Hyderabad)"
+source: "estimates for a prototype; check each plate against the Indian Food Composition Tables 2017 (NIN, Hyderabad). Checked 2026-10-18 (clinician review; IFCT 2017 not reached; plates not checked one by one)."
 verified: false
 #
 # diet: veg | egg | nonveg.  jain_ok: a Jain version (no onion, garlic or root vegetables) is

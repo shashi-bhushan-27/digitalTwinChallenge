@@ -11,11 +11,11 @@
 # configs/physiology_calibrated.yaml (an overlay).
 
 volumes:
-  vg_dl_per_kg: {value: 1.7, source: "Dalla Man et al., IEEE TBME 2007 (VG ~1.88 dL/kg); rounded; check", verified: false}
-  vi_ml_per_kg: {value: 120, source: "assumption: effective insulin distribution volume so that clearance ~1 L/min; check", verified: false}
+  vg_dl_per_kg: {value: 1.7, source: "Dalla Man et al., IEEE TBME 2007 (VG ~1.88 dL/kg); rounded; check. Checked 2026-10-18 (corrected-suggested, not changed): 1.7 is not a rounding of the 1.88 cited here; Table 1 not reached; BioModels T2D variant lists an unnamed 1.49.", verified: false}
+  vi_ml_per_kg: {value: 120, source: "assumption: effective insulin distribution volume so that clearance ~1 L/min; check. Checked 2026-10-18 (open): design-derived; Dalla Man Vi not retrieved, so no literature comparison possible.", verified: false}
 
 gut:
-  bioavailability: {value: 0.9, source: "Dalla Man et al. 2007 (f = 0.9); check", verified: false}
+  bioavailability: {value: 0.9, source: "Dalla Man et al. 2007 (f = 0.9). Checked 2026-10-18: BioModels MODEL1110030000, a curated implementation of the Dalla Man 2007 model, lists f = 0.9; the paper Table 1 was not reached.", verified: true}
   k_fast_per_min: 0.030      # gamma(shape 2) kernel peaking ~33 min after the meal
   k_slow_per_min: 0.011      # slow component peaking ~90 min
   fat_slowing_per_g: 0.010   # k /= 1 + a*fat + b*protein  (design assumption)
@@ -29,32 +29,32 @@ gut:
   meal_carb_jitter_sd: 0.10  # hidden gap between the portion's nominal and true carbs
 
 insulin:
-  n_per_min: {value: 0.14, source: "insulin plasma half-life ~5 min (Bergman/Dalla Man range); check", verified: false}
-  p2_per_min: {value: 0.025, source: "Bergman minimal model p2 range; check", verified: false}
+  n_per_min: {value: 0.14, source: "insulin plasma half-life ~5 min (Bergman/Dalla Man range); check. Checked 2026-10-18 (open): BioModels entry has no n; small human studies give early plasma half-lives of 3.9 and 8.2 min; 5 min is inside a wide 3-35 min literature range.", verified: false}
+  p2_per_min: {value: 0.025, source: "Bergman minimal model p2 range; check. Checked 2026-10-18 (open): no normative p2 found; the one worked example (0.021) is not a population value.", verified: false}
   tau_hepatic_min: 20
   secretion_threshold_mgdl: 80
   secretion_saturation_mgdl: 150   # drive = x / (1 + x / sat), x = glucose above threshold
   sigma_static: 0.035        # uU/mL/min per mg/dL of drive, at beta = 1
   sigma_basal: 0.30          # uU/mL/min glucose-independent secretion at beta = 1
-  alpha_per_min: {value: 0.05, source: "Dalla Man et al. 2007 secretion delay alpha; check", verified: false}
+  alpha_per_min: {value: 0.05, source: "Dalla Man et al. 2007 secretion delay alpha; check. Checked 2026-10-18 (corrected-suggested, not changed): BioModels MODEL1110030000 (T2D variant) lists alpha = 0.013 and beta = 0.05 per min; the 0.05 used here may be the beta term.", verified: false}
   k_dynamic: 0.40            # first-phase term per mg/dL/min rise, at beta = 1 (blunted in T2D)
   incretin_gain: 0.60        # fractional boost of glucose-stimulated secretion at high gut appearance
   incretin_ra_half: 3.0      # mg/dL/min of Ra giving half the incretin boost
 
 liver:
   i_half_ref: 25.0           # uU/mL insulin that halves glucose output (hepatic insulin sensitivity)
-  fatty_liver_i_half_factor: {value: 1.6, source: "assumption: hepatic insulin resistance with NAFLD; check", verified: false}
+  fatty_liver_i_half_factor: {value: 1.6, source: "assumption: hepatic insulin resistance with NAFLD; check. Checked 2026-10-18 (open): no source found for a 1.6 factor.", verified: false}
   i_half_sd: 0.20
   egp_plausible_mg_per_kg_min: [1.2, 5.0]
   counterreg_threshold_mgdl: 70
   counterreg_gain_per_min: 0.03
   counterreg_age_decline_per_yr: 0.01
-  dawn_amplitude: {value: 0.15, source: "assumption: dawn phenomenon raises hepatic output early morning in T2D; check", verified: false}
+  dawn_amplitude: {value: 0.15, source: "assumption: dawn phenomenon raises hepatic output early morning in T2D; check. Checked 2026-10-18 (open): dawn-phenomenon papers give definitions (rise of 10-30 mg/dL before breakfast) but no amplitude comparable to 0.15.", verified: false}
   dawn_center_h: 6.0
   dawn_width_h: 1.5
 
 sensitivity_rhythm:
-  evening_si_drop: {value: 0.15, source: "assumption: lower insulin sensitivity in the evening; check circadian literature", verified: false}
+  evening_si_drop: {value: 0.15, source: "assumption: lower insulin sensitivity in the evening; check circadian literature. Checked 2026-10-18 (open): a 2015 PNAS study (PMID 25870289) attributes the evening glucose-tolerance loss mainly to beta-cell function, not insulin sensitivity; no SI percentage found.", verified: false}
   evening_center_h: 21.0
   evening_width_h: 3.0
 
@@ -63,7 +63,7 @@ glucose_effectiveness:
   s_g_sd: 0.15
 
 kidney:
-  threshold_mgdl: {value: 190, source: "renal threshold ~180-200 mg/dL, higher in T2D; check", verified: false}
+  threshold_mgdl: {value: 190, source: "Wolf et al., Horm Metab Res 2009 (22 T2D, normal kidney function): virtual renal threshold median 11.0 mmol/L (about 198 mg/dL), range 7.8-12.1 mmol/L (about 140-218 mg/dL). Checked 2026-10-18 (abstract only, via search results; full text not reached). Authors argue against a single fixed threshold; the model uses one value.", verified: true}
 
 # Latent parameters from EHR fields (log-linear) plus unobservable variation (`noise_sd`).
 latent:
@@ -88,7 +88,7 @@ latent:
   fasting_glucose_noise_sd: 0.06   # unexplained part of the true fasting set point (log scale)
   fasting:
     fpg_weight: 0.35                # blend of the single lab FPG and the HbA1c-implied fasting level
-    fasting_to_mean_ratio: {value: 0.82, source: "assumption: fasting glucose ~80-85% of mean glucose in T2D; check CGM literature", verified: false}
+    fasting_to_mean_ratio: {value: 0.82, source: "assumption: fasting glucose ~80-85% of mean glucose in T2D; check CGM literature. Checked 2026-10-18 (open): no source found for the 0.82 ratio.", verified: false}
     max_fraction_of_mean: 0.88
   gastric_rate_sd: 0.20
   neuropathy_gastric_factor: 0.85
@@ -103,8 +103,8 @@ record_anchor:
   enabled: true
   mean_glucose_noise_sd: 0.07
   beta_multiplier_bounds: [0.2, 5.0]
-  min_basal_insulin: {value: 3.0, source: "assumption: fasting insulin rarely below ~3 uU/mL in T2D without insulin deficiency; check", verified: false}
-  max_basal_insulin: {value: 45.0, source: "assumption: fasting insulin rarely above ~45 uU/mL in T2D; check", verified: false}
+  min_basal_insulin: {value: 3.0, source: "assumption: fasting insulin rarely below ~3 uU/mL in T2D without insulin deficiency; check. Checked 2026-10-18 (open): no source found; clip bound only.", verified: false}
+  max_basal_insulin: {value: 45.0, source: "assumption: fasting insulin rarely above ~45 uU/mL in T2D; check. Checked 2026-10-18 (open): no source found; clip bound only.", verified: false}
   iterations: 14
   # [meal, clock, carbs g, fat g, protein g, fibre g, gi] - a typical Indian day, ~230 g carbs
   standard_day:
@@ -112,10 +112,10 @@ record_anchor:
     - [lunch, "13:30", 80, 14, 17, 9, high]
     - [snack, "17:30", 25, 6, 4, 1, high]
     - [dinner, "21:00", 70, 14, 17, 8, medium]
-  adag_source: {value: "eAG = 28.7 x HbA1c - 46.7", source: "Nathan DM et al., Diabetes Care 2008 (ADAG study); check", verified: false}
+  adag_source: {value: "eAG = 28.7 x HbA1c - 46.7", source: "Nathan DM et al., Diabetes Care 2008 (ADAG study), PMC2742903: linear regression eAG (mg/dL) = 28.7 x A1C - 46.7. Checked 2026-10-18; common/units.py uses the same constants.", verified: true}
 
 drugs:
-  source: "assumption: effect sizes chosen to give label-typical HbA1c reductions; clinical review required"
+  source: "assumption: effect sizes chosen to give label-typical HbA1c reductions; clinical review required. Checked 2026-10-18 (clinician review, not verified here): not checked against label data; drug rules need a clinician."
   verified: false
   metformin:
     effect_half_life_h: 12
@@ -151,7 +151,7 @@ exercise:
 day_to_day:
   si_ar_sd: 0.12
   si_ar_rho: 0.5
-  sleep_deficit_si_per_h: {value: 0.08, source: "assumption: sleep restriction lowers next-day insulin sensitivity; check sleep-restriction studies", verified: false}
+  sleep_deficit_si_per_h: {value: 0.08, source: "assumption: sleep restriction lowers next-day insulin sensitivity; check sleep-restriction studies. Checked 2026-10-18 (open): size is consistent with Broussard et al. Ann Intern Med 2012 (n=7; 16% lower insulin sensitivity after 4 nights at 4.5 h vs 8.5 h). The model applies it nightly; single-night effect not tested.", verified: false}
   sleep_reference_h: 7.0
   stress_si_per_sd: 0.10
   stress_egp_per_sd: 0.04
