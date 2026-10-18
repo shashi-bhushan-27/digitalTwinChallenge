@@ -7,7 +7,7 @@ cgm:
   session_days: 10
   first_session_offset_days: [-4.0, 0.0]
   warmup_h: 2
-  lag_tau_min: {value: [5, 15], source: "blood-to-interstitial glucose lag of ~5-15 min (CLAUDE.md brief; CGM physiology literature); check", verified: false}
+  lag_tau_min: {value: [5, 15], source: "blood-to-interstitial glucose lag of ~5-15 min (CLAUDE.md brief; CGM physiology literature); check. Checked 2026-10-18 (open): Rebrin et al. 2010 review finds a physiological delay of about 5-10 min at steady state; dynamic estimates run 15-30 min. The config value is a time constant, not a delay; not confirmed.", verified: false}
   gain_sd: 0.04
   offset_sd_mgdl: 4.0
   gain_drift_sd_per_day: 0.012
